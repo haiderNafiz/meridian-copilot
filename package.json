@@ -1,0 +1,20 @@
+{
+  "name": "meridian-copilot",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bullmq": "^5.76.10",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "ioredis": "^5.10.1"
+  }
+}
