@@ -5,16 +5,20 @@
   "description": "",
   "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:hubspot": "node tests/testHubspot.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@hubspot/api-client": "^13.5.0",
+    "@slack/web-api": "^7.16.0",
     "bullmq": "^5.76.10",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^4.21.2",
-    "ioredis": "^5.10.1"
+    "ioredis": "^5.10.1",
+    "pg": "^8.21.0"
   }
 }
