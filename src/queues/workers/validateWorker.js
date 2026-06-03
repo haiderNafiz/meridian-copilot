@@ -10,6 +10,11 @@ import {
   upsertContact
 } from "../../services/hubspot.js";
 
+import {
+  saveFailedJob
+}
+from "../../services/deadLetterService.js";
+
 const worker = new Worker(
   "candidateQueue",
   async job => {
@@ -32,11 +37,11 @@ const worker = new Worker(
     const email = payload.email;
 
     // Retry testing
-    //if (email === "fail@test.com") {
-      //throw new Error(
-        //"Intentional test failure"
-      //);
-    //}
+    if (email === "fail@test.com") {
+      throw new Error(
+        "Intentional test failure"
+      );
+    }
 
     const source = "form_submission";
 
@@ -145,19 +150,67 @@ worker.on(
 
 
 // Job failed
+//worker.on(
+  //"failed",
+  //(job, err) => {
+
+    //console.error(
+      //`Job ${job.id} failed on attempt ${job.attemptsMade}`
+    //);
+
+    //console.error(
+      //err.message
+    //);
+
+  //}
+//);
+
+//worker.on(
+  //"failed",
+  //async (job, err) => {
+
+    //console.error(
+      //`Job ${job.id} failed`
+    //);
+
+    //await saveFailedJob(
+      //job,
+      //err
+    //);
+
+    //console.log(
+      //"Saved to DLQ table"
+    //);
+
+  //}
+//);
+
 worker.on(
   "failed",
-  (job, err) => {
+  async (job, err) => {
 
     console.error(
       `Job ${job.id} failed on attempt ${job.attemptsMade}`
     );
 
-    console.error(
-      err.message
-    );
+    if(
+      job.attemptsMade ===
+      job.opts.attempts
+    ){
+
+      await saveFailedJob(
+        job,
+        err
+      );
+
+      console.log(
+        "Final failure saved to DLQ"
+      );
+
+    }
 
   }
 );
+
 
 export default worker;
