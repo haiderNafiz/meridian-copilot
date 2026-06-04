@@ -15,26 +15,41 @@ import {
 }
 from "../../services/deadLetterService.js";
 
+import { logger } from "../../utils/logger.js";
+
 const worker = new Worker(
   "candidateQueue",
   async job => {
 
-    console.log(
-      `Processing Job ${job.id}`
-    );
+    //console.log(
+      //`Processing Job ${job.id}`
+    //);
 
-    console.log(
-      `Attempt ${job.attemptsMade + 1}`
-    );
+    //console.log(
+      //`Attempt ${job.attemptsMade + 1}`
+    //);
 
-    console.log(
-      "Processing:",
-      job.data
-    );
+    logger.info("job.attempt", {
+      jobId: job.id,
+      attempt: job.attemptsMade + 1
+    });
 
+
+    //console.log(
+      //"Processing:",
+      //job.data
+    //);
+
+    logger.info("job.processing.started", {
+      jobId: job.id,
+      queue: "candidateQueue"
+    });
+
+    const jobId = job.id;
     const payload = job.data.payload;
-
     const email = payload.email;
+
+    const traceId = job.id;
 
     // Retry testing
     if (email === "fail@test.com") {
@@ -56,9 +71,15 @@ const worker = new Worker(
       [email, source]
     );
 
-    console.log(
-      "Saved to database"
-    );
+    //console.log(
+      //"Saved to database"
+    //);
+
+    logger.info("db.insert.success", {
+      traceId,
+      email,
+      jobId: job.id
+    });
 
     let candidate;
 
@@ -89,9 +110,11 @@ const worker = new Worker(
       current_title: ""
     };
 
-    console.log(
-      "Calling HubSpot..."
-    );
+    //console.log(
+      //"Calling HubSpot..."
+    //);
+
+    logger.info("hubspot.sync.started", {traceId, email });
 
     try {
 
@@ -100,9 +123,16 @@ const worker = new Worker(
           hubspotCandidate
         );
 
-      console.log(
-        "HubSpot completed"
-      );
+      //console.log(
+        //"HubSpot completed"
+      //);
+
+      logger.info("hubspot.sync.success", {
+        traceId,
+        email,
+        hubspotId: hubspotResult.hubspot_id,
+        action: hubspotResult.action
+      });
 
       console.log(
         "HubSpot:",
@@ -111,25 +141,40 @@ const worker = new Worker(
 
     } catch (error) {
 
-      console.error(
-        "HubSpot sync failed:",
-        error.message
-      );
+      //console.error(
+        //"HubSpot sync failed:",
+        //error.message
+      //);
+
+      logger.error("hubspot.sync.failed", {
+        traceId,
+        email,
+        error: error.message
+      });
 
     }
 
-    console.log(
-      "Calling Slack..."
-    );
+    //console.log(
+      //"Calling Slack..."
+    //);
+
+    logger.info("slack.notification.started", {
+      email,
+      jobId: job.id
+    });
 
     await sendNewCandidateAlert(
       email,
       source
     );
 
-    console.log(
-      "Slack alert sent"
-    );
+    //console.log(
+      //"Slack alert sent"
+    //);
+
+    logger.info("slack.notification.sent", {
+      email
+    });
 
   },
   { connection }
