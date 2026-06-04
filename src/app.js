@@ -1,5 +1,7 @@
 import express from 'express';
 import { candidateQueue } from "./queues/candidateQueue.js";
+import healthRoutes from "./routes/healthRoutes.js";
+
 import cors from 'cors';
 import 'dotenv/config';
 
@@ -42,6 +44,12 @@ app.post("/webhooks/form-submission", async (req, res) => {
     message: "Candidate queued successfully"
   });
 });
+
+
+app.use(
+  "/",
+  healthRoutes
+);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
