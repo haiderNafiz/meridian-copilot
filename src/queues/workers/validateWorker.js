@@ -1,6 +1,7 @@
 import { Worker } from "bullmq";
 import connection from "../redisConnection.js";
 import pool from "../../db/index.js";
+import { createStageTimer } from "../../utils/timer.js";
 
 import {
   sendNewCandidateAlert
@@ -17,6 +18,9 @@ from "../../services/deadLetterService.js";
 
 import { logger } from "../../utils/logger.js";
 
+//const jobTimer = startTimer();
+
+
 const worker = new Worker(
   "candidateQueue",
   async job => {
@@ -28,6 +32,12 @@ const worker = new Worker(
     //console.log(
       //`Attempt ${job.attemptsMade + 1}`
     //);
+
+    
+    const timer = createStageTimer();
+    const traceId = job.id;
+    const payload = job.data.payload;
+    const email = payload.email;
 
     logger.info("job.attempt", {
       jobId: job.id,
@@ -41,16 +51,17 @@ const worker = new Worker(
     //);
 
     logger.info("job.processing.started", {
+      traceId,
       jobId: job.id,
+      attempt: job.attemptsMade + 1,
       queue: "candidateQueue"
     });
 
-    const jobId = job.id;
-    const payload = job.data.payload;
-    const email = payload.email;
+    //const jobId = job.id;
+    //const payload = job.data.payload;
+    //const email = payload.email;
 
-    const traceId = job.id;
-
+    
     // Retry testing
     if (email === "fail@test.com") {
       throw new Error(
@@ -75,10 +86,15 @@ const worker = new Worker(
       //"Saved to database"
     //);
 
+    const dbTiming = timer.mark("db");
+
     logger.info("db.insert.success", {
       traceId,
       email,
-      jobId: job.id
+      jobId: job.id,
+      stage:dbTiming.stage,
+      durationMs: dbTiming.durationMs
+  
     });
 
     let candidate;
@@ -119,9 +135,7 @@ const worker = new Worker(
     try {
 
       const hubspotResult =
-        await upsertContact(
-          hubspotCandidate
-        );
+        await upsertContact(hubspotCandidate);
 
       //console.log(
         //"HubSpot completed"
@@ -131,7 +145,8 @@ const worker = new Worker(
         traceId,
         email,
         hubspotId: hubspotResult.hubspot_id,
-        action: hubspotResult.action
+        action: hubspotResult.action,
+        ...timer.mark("hubspot"),
       });
 
       console.log(
@@ -159,29 +174,41 @@ const worker = new Worker(
     //);
 
     logger.info("slack.notification.started", {
-      email,
-      jobId: job.id
+      traceId,
+      email
+      
     });
 
-    await sendNewCandidateAlert(
-      email,
-      source
-    );
+    try {
+
+      await sendNewCandidateAlert(email,source);
 
     //console.log(
       //"Slack alert sent"
     //);
 
-    logger.info("slack.notification.sent", {
-      email
-    });
+      logger.info("slack.notification.sent", {
+        traceId,
+        email,
+        ...timer.mark("slack"),
+      });
+
+    } catch (error) {
+      logger.error("slack.notification.failed", {
+        traceId,
+        email,
+        error: error.message,
+      });
+
+    }
 
   },
   { connection }
 );
 
 
-// Job completed
+
+// Job completed event
 worker.on(
   "completed",
   job => {
@@ -229,6 +256,8 @@ worker.on(
 
   //}
 //);
+
+//failed even + DLQ
 
 worker.on(
   "failed",
