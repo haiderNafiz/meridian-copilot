@@ -1,12 +1,30 @@
+import pool from "../db/index.js";
+
 function baseLog(level, event, data = {}) {
-  console.log(
-    JSON.stringify({
+  const logObject = {
+    level,
+    event,
+    timestamp: new Date().toISOString(),
+    ...data,
+  };
+
+  console.log(JSON.stringify(logObject));
+
+  // async DB write (fire and forget)
+  pool.query(
+    `
+    INSERT INTO logs(trace_id, level, event, payload)
+    VALUES ($1, $2, $3, $4)
+    `,
+    [
+      data.traceId || null,
       level,
       event,
-      timestamp: new Date().toISOString(),
-      ...data
-    })
-  );
+      JSON.stringify(data),
+    ]
+  ).catch(err => {
+    console.error("Log DB insert failed:", err.message);
+  });
 }
 
 export const logger = {

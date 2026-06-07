@@ -4,6 +4,7 @@ import healthRoutes from "./routes/healthRoutes.js";
 
 import cors from 'cors';
 import 'dotenv/config';
+import pool from "./db/index.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -53,4 +54,23 @@ app.use(
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+});
+
+
+
+// log api endpoint
+app.get("/logs/:traceId", async (req, res) => {
+  const { traceId } = req.params;
+
+  const result = await pool.query(
+    `
+    SELECT *
+    FROM logs
+    WHERE trace_id = $1
+    ORDER BY created_at ASC
+    `,
+    [traceId]
+  );
+
+  res.json(result.rows);
 });
