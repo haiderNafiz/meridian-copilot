@@ -2,10 +2,16 @@ import express from "express";
 import pool from "../db/index.js";
 import IORedis from "ioredis";
 
+//import connection from "../queues/redisConnection.js";
+
+
+
 const router = express.Router();
 
+
+
 const redis = new IORedis({
-  host: "127.0.0.1",
+  host: "redis",
   port: 6379
 });
 
@@ -50,31 +56,24 @@ router.get(
 );
 
 
-router.get(
-  "/health/redis",
-  async (req, res) => {
 
-    try {
+router.get("/health/redis", async (req, res) => {
+  try {
+    const result = await redis.ping();
 
-      const result =
-        await redis.ping();
+    res.json({
+      status: "UP",
+      redis: result
+    });
 
-      res.json({
-        status: "UP",
-        redis: result
-      });
-
-    }
-    catch(error){
-
-      res.status(500).json({
-        status: "DOWN",
-        redis: "unreachable"
-      });
-
-    }
-
+  } catch (error) {
+    res.status(500).json({
+      status: "DOWN",
+      redis: "unreachable"
+    });
   }
-);
+});
+
 
 export default router;
+
