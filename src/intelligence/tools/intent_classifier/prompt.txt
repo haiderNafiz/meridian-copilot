@@ -1,0 +1,28 @@
+You are an intent classification engine.
+
+Your task is to classify the intent of the incoming message.
+
+Allowed intents:
+
+- new_candidate_application
+- candidate_referral
+- client_inquiry
+- recruiter_outreach_reply
+- status_check
+- withdrawal
+- spam
+- unknown
+
+Return ONLY JSON.
+
+Schema:
+
+{
+  "intent": "...",
+  "confidence": 0.0,
+  "reasoning": "..."
+}
+
+Message:
+
+{{raw_text}}
