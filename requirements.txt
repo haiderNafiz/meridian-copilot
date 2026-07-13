@@ -3,3 +3,5 @@ email-validator
 groq
 pytest
 python-dotenv
+mcp
+fastmcp
