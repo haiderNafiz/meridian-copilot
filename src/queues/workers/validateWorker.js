@@ -2,6 +2,7 @@ import { Worker } from "bullmq";
 import connection from "../redisConnection.js";
 import pool from "../../db/index.js";
 import { createStageTimer } from "../../utils/timer.js";
+import { intelligenceGateway } from "../../services/intelligenceGateway.js";
 
 import {
   sendNewCandidateAlert
@@ -67,6 +68,38 @@ const worker = new Worker(
       throw new Error(
         "Intentional test failure"
       );
+    }
+
+    // Run intent classification before proceeding with database and sync pipelines
+    logger.info("intelligence.classification.started", { traceId, email });
+    const rawText = payload.message || payload.text || payload.note || payload.current_title || "";
+    const classification = await intelligenceGateway.classifyCandidateIntent(
+      rawText,
+      "form",
+      email,
+      {
+        event_id: `evt_${traceId}`,
+        job_id: job.id,
+        trace_id: traceId
+      }
+    );
+
+    logger.info("intelligence.classification.success", {
+      traceId,
+      email,
+      intent: classification.intent,
+      confidence: classification.confidence,
+      fallback_used: classification.fallback_used,
+      reasoning: classification.reasoning
+    });
+
+    if (classification.intent === "spam") {
+      logger.info("job.processing.spam_ignored", {
+        traceId,
+        email,
+        reasoning: classification.reasoning
+      });
+      return; // Exit early: do not sync or write to PostgreSQL
     }
 
     const source = "form_submission";
