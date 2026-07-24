@@ -71,7 +71,10 @@ class QualificationScorerService:
             metadata=metadata,
             payload=payload,
             retrieved_chunks=retrieved_chunk_ids,
-            provider_chain=provider_chain
+            provider_chain=provider_chain,
+            candidate_profile=profile_res,
+            candidate_enrichment=enrich_res,
+            retrieved_context=retrieval_res.payload.results
         )
 
 _service_instance = None

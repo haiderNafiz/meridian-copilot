@@ -34,6 +34,10 @@ class QualificationPayload(BaseModel):
         description="Detailed overview of how dimension variables shaped overall outcome"
     )
 
+from src.intelligence.tools.candidate_profiler.schema import CandidateOutput
+from src.intelligence.tools.deterministic_enricher.schema import EnrichmentOutput
+from src.intelligence.tools.knowledge_service.schema import RetrievalResult
+
 class QualificationOutput(BaseResponse):
     payload: QualificationPayload
     retrieved_chunks: List[str] = Field(
@@ -44,3 +48,6 @@ class QualificationOutput(BaseResponse):
         default_factory=list,
         description="Execution sequence of platform components forming this result"
     )
+    candidate_profile: Optional[CandidateOutput] = Field(default=None, description="Compiled candidate profile details")
+    candidate_enrichment: Optional[EnrichmentOutput] = Field(default=None, description="Deterministic enrichment fields")
+    retrieved_context: Optional[List[RetrievalResult]] = Field(default=None, description="Full text segments retrieved during scoring")

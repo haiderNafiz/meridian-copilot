@@ -14,6 +14,8 @@ from src.intelligence.tools.knowledge_service.embedding.mock_embed import MockEm
 from src.intelligence.tools.knowledge_service.ranking.cosine import CosineSimilarityRanker
 from src.intelligence.tools.qualification_scorer.schema import QualificationInput
 from src.intelligence.tools.qualification_scorer.service import get_qualification_scorer_service
+from src.intelligence.tools.summarizer.schema import SummarizationInput
+from src.intelligence.tools.summarizer.service import get_summarization_service
 from src.intelligence.platform.telemetry import mcp_telemetry
 from src.intelligence.platform.metadata import ResponseMetadata
 
@@ -214,6 +216,34 @@ async def score_qualification(
         # Resolve the lazy-loaded singleton service
         service = get_qualification_scorer_service()
         
+        result = service.process(input_data)
+        collector.metadata = result.metadata
+        return result.model_dump_json()
+
+@mcp.tool(
+    name="summarize_candidate",
+    description="Generate a detailed, evidence-grounded recruiter summary matching qualification scores and job descriptions."
+)
+async def summarize_candidate(
+    raw_text: str,
+    job_description_id: str,
+    email: Optional[str] = None,
+    location: Optional[str] = None,
+    technology_keywords: Optional[list] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Generate a detailed, evidence-grounded candidate qualification summary.
+    """
+    with mcp_telemetry("summarize_candidate", context) as collector:
+        input_data = SummarizationInput(
+            raw_text=raw_text,
+            job_description_id=job_description_id,
+            email=email,
+            location=location,
+            technology_keywords=technology_keywords
+        )
+        service = get_summarization_service()
         result = service.process(input_data)
         collector.metadata = result.metadata
         return result.model_dump_json()
