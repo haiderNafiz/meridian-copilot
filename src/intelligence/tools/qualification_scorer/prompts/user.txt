@@ -1,0 +1,17 @@
+Evaluate candidate qualification matching indicators.
+
+=== Candidate Profile (Profiler Output) ===
+* Target Role Type: {{ candidate_role_type }}
+* Target Seniority Level: {{ candidate_seniority }}
+* Availability / Urgency: {{ candidate_urgency }}
+* Technical Domains: {{ candidate_technical_domains }}
+* Predicted Functions: {{ candidate_predicted_functions }}
+
+=== Candidate Enrichment (Enricher Output) ===
+* Normalized Tech keywords: {{ candidate_technologies }}
+* Canonical Timezone / Location: {{ candidate_timezone }} ({{ candidate_country }})
+
+=== Target Job Requirements Context ===
+{{ retrieved_chunks_section }}
+
+Perform the matching evaluation and output the JSON scoring payload.

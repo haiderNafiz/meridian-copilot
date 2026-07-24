@@ -12,6 +12,8 @@ from src.intelligence.tools.knowledge_service.provider import RetrievalProvider
 from src.intelligence.tools.knowledge_service.store.mock_store import MockVectorStore
 from src.intelligence.tools.knowledge_service.embedding.mock_embed import MockEmbeddingProvider
 from src.intelligence.tools.knowledge_service.ranking.cosine import CosineSimilarityRanker
+from src.intelligence.tools.qualification_scorer.schema import QualificationInput
+from src.intelligence.tools.qualification_scorer.service import get_qualification_scorer_service
 from src.intelligence.platform.telemetry import mcp_telemetry
 from src.intelligence.platform.metadata import ResponseMetadata
 
@@ -183,6 +185,37 @@ async def retrieve_knowledge(
         # Populate response metadata for telemetry collection
         collector.metadata = result.metadata
         
+        return result.model_dump_json()
+
+@mcp.tool(
+    name="score_qualification",
+    description="Compute multidimensional qualification alignment scores comparing candidate profiles vs target requirements."
+)
+async def score_qualification(
+    raw_text: str,
+    job_description_id: str,
+    email: Optional[str] = None,
+    location: Optional[str] = None,
+    technology_keywords: Optional[list] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Compute multidimensional qualification alignment scores.
+    """
+    with mcp_telemetry("score_qualification", context) as collector:
+        input_data = QualificationInput(
+            raw_text=raw_text,
+            job_description_id=job_description_id,
+            email=email,
+            location=location,
+            technology_keywords=technology_keywords
+        )
+        
+        # Resolve the lazy-loaded singleton service
+        service = get_qualification_scorer_service()
+        
+        result = service.process(input_data)
+        collector.metadata = result.metadata
         return result.model_dump_json()
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ import { intentClient } from "./intentClient.js";
 import { candidateClient } from "./candidateClient.js";
 import { enrichmentClient } from "./enrichmentClient.js";
 import { retrievalClient } from "./retrievalClient.js";
+import { qualificationClient } from "./qualificationClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -102,6 +103,35 @@ export const intelligenceGateway = {
     console.log(`[Intelligence Gateway] Routing retrieveKnowledge - TraceID: ${context.trace_id}`);
 
     return retrievalClient.retrieveKnowledge(query, collection, limit, threshold, filters, context);
+  },
+
+  /**
+   * Facade method for Qualification Scorer evaluation.
+   * @param {string} rawText - Unstructured candidate description or resume content.
+   * @param {string} jobDescriptionId - Target job description identifier.
+   * @param {string} [email] - Candidate email identifier.
+   * @param {string} [location] - Raw candidate location details.
+   * @param {string[]} [technologyKeywords] - List of technologies.
+   * @param {Object} [jobContextData] - Context map containing event_id, job_id, and trace_id.
+   * @returns {Promise<Object>} Qualification output.
+   */
+  async scoreQualification(
+    rawText,
+    jobDescriptionId,
+    email = null,
+    location = null,
+    technologyKeywords = null,
+    jobContextData = {}
+  ) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing scoreQualification - TraceID: ${context.trace_id}`);
+
+    return qualificationClient.scoreQualification(rawText, jobDescriptionId, email, location, technologyKeywords, context);
   },
 
   /**

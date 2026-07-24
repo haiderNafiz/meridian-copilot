@@ -46,6 +46,19 @@ class MockVectorStore:
                 )
             )
         ]
+        self._store["job_descriptions"] = [
+            VectorRecord(
+                text="Require a senior software engineer specialized in distributed systems and Go.",
+                vector=[1.0, 0.0, 0.0, 0.0],
+                metadata=ChunkMetadata(
+                    document_id="doc_jd_go_dev",
+                    chunk_id="doc_jd_go_dev_chunk_0",
+                    source="jd_go.pdf",
+                    chunk_index=0,
+                    custom_tags={}
+                )
+            )
+        ]
 
     def query(
         self,
