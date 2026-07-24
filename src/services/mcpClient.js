@@ -16,7 +16,8 @@ async function initClient() {
   console.log(`[MCP Client] Initializing Stdio transport with Python executable: ${pythonPath}`);
   transportInstance = new StdioClientTransport({
     command: pythonPath,
-    args: ["-m", "src.intelligence.mcp.server"]
+    args: ["-m", "src.intelligence.mcp.server"],
+    env: { ...process.env }
   });
 
   clientInstance = new Client(

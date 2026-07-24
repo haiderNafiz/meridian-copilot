@@ -1,8 +1,9 @@
 from pydantic import BaseModel, EmailStr
 from typing import Literal
+from src.intelligence.platform.contracts import BaseRequest
 
 
-class IntentInput(BaseModel):
+class IntentInput(BaseRequest):
     raw_text: str
 
     source: Literal[

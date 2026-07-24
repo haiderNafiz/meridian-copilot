@@ -1,0 +1,15 @@
+FREE_EMAIL_DOMAINS = {
+    "gmail.com",
+    "yahoo.com",
+    "outlook.com",
+    "hotmail.com",
+    "icloud.com",
+    "aol.com",
+    "mail.com",
+    "zoho.com",
+    "protonmail.com",
+    "proton.me",
+    "yandex.com",
+    "live.com",
+    "gmx.com",
+}
