@@ -1,6 +1,7 @@
 import { intentClient } from "./intentClient.js";
 import { candidateClient } from "./candidateClient.js";
 import { enrichmentClient } from "./enrichmentClient.js";
+import { retrievalClient } from "./retrievalClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -72,6 +73,35 @@ export const intelligenceGateway = {
     console.log(`[Intelligence Gateway] Routing enrichEntity - TraceID: ${context.trace_id}`);
 
     return enrichmentClient.enrichEntity(params, context);
+  },
+
+  /**
+   * Facade method for Knowledge Platform semantic retrieval.
+   * @param {string} query - Search term.
+   * @param {string} [collection] - Target namespace collection.
+   * @param {number} [limit] - Max chunks to retrieve.
+   * @param {number} [threshold] - Score cut-off filters.
+   * @param {Object} [filters] - Metadata filters.
+   * @param {Object} [jobContextData] - Context map containing event_id, job_id, and trace_id.
+   * @returns {Promise<Object>} Retrieval output.
+   */
+  async retrieveKnowledge(
+    query,
+    collection = "default",
+    limit = 5,
+    threshold = 0.0,
+    filters = null,
+    jobContextData = {}
+  ) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing retrieveKnowledge - TraceID: ${context.trace_id}`);
+
+    return retrievalClient.retrieveKnowledge(query, collection, limit, threshold, filters, context);
   },
 
   /**

@@ -6,6 +6,12 @@ from src.intelligence.tools.candidate_profiler.profiler import get_candidate_pro
 from src.intelligence.tools.candidate_profiler.schema import CandidateInput
 from src.intelligence.tools.deterministic_enricher.schema import EnrichmentInput
 from src.intelligence.tools.deterministic_enricher.service import DeterministicEnrichmentService
+from src.intelligence.tools.knowledge_service.schema import RetrievalInput
+from src.intelligence.tools.knowledge_service.service import RetrievalService
+from src.intelligence.tools.knowledge_service.provider import RetrievalProvider
+from src.intelligence.tools.knowledge_service.store.mock_store import MockVectorStore
+from src.intelligence.tools.knowledge_service.embedding.mock_embed import MockEmbeddingProvider
+from src.intelligence.tools.knowledge_service.ranking.cosine import CosineSimilarityRanker
 from src.intelligence.platform.telemetry import mcp_telemetry
 from src.intelligence.platform.metadata import ResponseMetadata
 
@@ -134,6 +140,44 @@ async def enrich_entity(
         )
         
         service = DeterministicEnrichmentService()
+        result = service.process(input_data)
+        
+        # Populate response metadata for telemetry collection
+        collector.metadata = result.metadata
+        
+        return result.model_dump_json()
+
+@mcp.tool(
+    name="retrieve_knowledge",
+    description="Retrieve relevant knowledge context chunks from vector collections based on semantic query similarity."
+)
+async def retrieve_knowledge(
+    query: str,
+    collection: str = "default",
+    limit: int = 5,
+    threshold: float = 0.0,
+    filters: Optional[dict] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Retrieve knowledge context chunks deterministically using similarity ranking.
+    """
+    with mcp_telemetry("retrieve_knowledge", context) as collector:
+        input_data = RetrievalInput(
+            query=query,
+            collection=collection,
+            limit=limit,
+            threshold=threshold,
+            filters=filters
+        )
+        
+        # Resolve components via Dependency Injection
+        store = MockVectorStore()
+        embedder = MockEmbeddingProvider()
+        ranker = CosineSimilarityRanker()
+        provider = RetrievalProvider(store=store, embedding=embedder, ranker=ranker)
+        service = RetrievalService(provider=provider)
+        
         result = service.process(input_data)
         
         # Populate response metadata for telemetry collection
