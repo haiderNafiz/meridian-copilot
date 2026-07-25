@@ -18,6 +18,8 @@ from src.intelligence.tools.summarizer.schema import SummarizationInput
 from src.intelligence.tools.summarizer.service import get_summarization_service
 from src.intelligence.tools.context_builder.schema import ContextBuilderInput
 from src.intelligence.tools.context_builder.service import get_context_builder_service
+from src.intelligence.tools.memory_service.schema import MemoryStoreRequest, MemoryRetrieveRequest, MemoryQuery
+from src.intelligence.tools.memory_service.service import get_memory_service
 from src.intelligence.platform.telemetry import mcp_telemetry
 from src.intelligence.platform.metadata import ResponseMetadata
 
@@ -294,6 +296,87 @@ async def build_context(
         
         service = get_context_builder_service()
         result = service.process(input_data)
+        collector.metadata = result.metadata
+        return result.model_dump_json()
+
+@mcp.tool(
+    name="save_memory",
+    description="Persist or merge a ContextSnapshot into the append-only memory store log."
+)
+async def save_memory(
+    snapshot: dict,
+    session_id: Optional[str] = None,
+    tags: Optional[list] = None,
+    importance: float = 1.0,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Persist or merge a ContextSnapshot.
+    """
+    with mcp_telemetry("save_memory", context) as collector:
+        from src.intelligence.tools.context_builder.schema import ContextSnapshot
+        snapshot_model = ContextSnapshot.model_validate(snapshot)
+        
+        input_data = MemoryStoreRequest(
+            snapshot=snapshot_model,
+            session_id=session_id,
+            tags=tags or [],
+            importance=importance
+        )
+        service = get_memory_service()
+        result = service.save_memory(input_data)
+        collector.metadata = result.metadata
+        return result.model_dump_json()
+
+@mcp.tool(
+    name="retrieve_memory",
+    description="Retrieve memory snapshots by memory_id, context_id, or session_id from the append-only log."
+)
+async def retrieve_memory(
+    memory_id: Optional[str] = None,
+    context_id: Optional[str] = None,
+    session_id: Optional[str] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Retrieve memory snapshots by identifiers.
+    """
+    with mcp_telemetry("retrieve_memory", context) as collector:
+        input_data = MemoryRetrieveRequest(
+            memory_id=memory_id,
+            context_id=context_id,
+            session_id=session_id
+        )
+        service = get_memory_service()
+        result = service.retrieve_memory(input_data)
+        collector.metadata = result.metadata
+        return result.model_dump_json()
+
+@mcp.tool(
+    name="search_memory",
+    description="Scan and search persistent memory snapshots matching tag filters and keyword queries."
+)
+async def search_memory(
+    query_text: Optional[str] = None,
+    session_id: Optional[str] = None,
+    tags: Optional[list] = None,
+    importance_threshold: float = 0.0,
+    limit: int = 10,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Scan and search persistent memories.
+    """
+    with mcp_telemetry("search_memory", context) as collector:
+        input_data = MemoryQuery(
+            query_text=query_text,
+            session_id=session_id,
+            tags=tags or [],
+            importance_threshold=importance_threshold,
+            limit=limit
+        )
+        service = get_memory_service()
+        result = service.search_memory(input_data)
         collector.metadata = result.metadata
         return result.model_dump_json()
 

@@ -27,14 +27,14 @@ This document outlines the milestones and completion statuses of the Meridian Re
 ### Phase 3: State & Agentic Layer
 *   [x] **Milestone 8 — Context Builder**
     - Implemented pure composition builder compiling immutable `ContextSnapshot` models.
+*   [x] **Milestone 9 — Memory Service**
+    - Persisting `ContextSnapshot` files to abstract memory stores with merge policies.
 
 ---
 
 ## Planned Milestones
 
 ### Phase 3: State & Agentic Layer (Continued)
-*   [ ] **Milestone 9 — Memory Service** (Design Approved, Pending Implementation)
-    - Persisting `ContextSnapshot` files to abstract memory stores with merge policies.
 *   [ ] **Milestone 10 — Agent Orchestrator**
     - Designing conversational controllers routing sub-agent tasks.
 *   [ ] **Milestone 11 — Planner**

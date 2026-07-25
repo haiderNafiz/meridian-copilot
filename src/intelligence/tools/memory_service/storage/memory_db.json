@@ -1,0 +1,62 @@
+[
+  {
+    "metadata": {
+      "memory_id": "c84b1f72-8271-4a33-80a2-57b7689f1c0a",
+      "context_id": "ctx_mcp_save_1",
+      "session_id": "session_mcp_99",
+      "parent_memory_id": null,
+      "created_at": "2026-07-25T19:56:47.430630Z",
+      "last_accessed_at": "2026-07-25T19:56:47.430630Z",
+      "access_count": 1,
+      "tags": [
+        "go_lang"
+      ],
+      "importance": 0.75,
+      "version": "1.0.0",
+      "is_pinned": false,
+      "is_archived": false
+    },
+    "snapshot": {
+      "metadata": {
+        "context_id": "ctx_mcp_save_1",
+        "session_id": null,
+        "schema_version": "1.0.0",
+        "timestamp_utc": "2026-07-25T12:00:00Z",
+        "provenance": [
+          "P1"
+        ],
+        "overall_confidence": 0.88
+      },
+      "inputs": {
+        "document_references": [
+          "doc_ref_99"
+        ],
+        "raw_text": "Larry Go Developer"
+      },
+      "facts": {
+        "role_type": "Backend",
+        "seniority": null,
+        "technical_domains": [
+          "Go"
+        ],
+        "normalized_technologies": [],
+        "timezone": null,
+        "country": null
+      },
+      "evidence": {
+        "profile_evidence": [],
+        "scoring_evidence": {}
+      },
+      "reasoning": {
+        "scoring_reasoning": {},
+        "summary_reasoning": null,
+        "weaknesses_or_risks": null,
+        "recruiter_recommendation": null
+      },
+      "outputs": {
+        "qualification_scores": null,
+        "recruiter_summary": null
+      }
+    }
+  }
+]

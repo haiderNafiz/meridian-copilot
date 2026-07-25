@@ -5,6 +5,7 @@ import { retrievalClient } from "./retrievalClient.js";
 import { qualificationClient } from "./qualificationClient.js";
 import { summarizationClient } from "./summarizationClient.js";
 import { contextBuilderClient } from "./contextBuilderClient.js";
+import { memoryClient } from "./memoryClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -211,6 +212,33 @@ export const intelligenceGateway = {
       recruiterSummary,
       context
     );
+  },
+
+  /**
+   * Facade method for saving or merging a ContextSnapshot to the Memory Service.
+   */
+  async saveMemory(snapshot, sessionId = null, tags = [], importance = 1.0, context = {}) {
+    context.trace_id = context.trace_id || `tr_${Math.floor(Math.random() * 1000000)}`;
+    console.log(`[Intelligence Gateway] Routing saveMemory - TraceID: ${context.trace_id}`);
+    return memoryClient.saveMemory(snapshot, sessionId, tags, importance, context);
+  },
+
+  /**
+   * Facade method for retrieving memories by identifiers.
+   */
+  async retrieveMemory(memoryId = null, contextId = null, sessionId = null, context = {}) {
+    context.trace_id = context.trace_id || `tr_${Math.floor(Math.random() * 1000000)}`;
+    console.log(`[Intelligence Gateway] Routing retrieveMemory - TraceID: ${context.trace_id}`);
+    return memoryClient.retrieveMemory(memoryId, contextId, sessionId, context);
+  },
+
+  /**
+   * Facade method for searching memories using query criteria.
+   */
+  async searchMemory(queryText = null, sessionId = null, tags = [], importanceThreshold = 0.0, limit = 10, context = {}) {
+    context.trace_id = context.trace_id || `tr_${Math.floor(Math.random() * 1000000)}`;
+    console.log(`[Intelligence Gateway] Routing searchMemory - TraceID: ${context.trace_id}`);
+    return memoryClient.searchMemory(queryText, sessionId, tags, importanceThreshold, limit, context);
   },
 
   /**

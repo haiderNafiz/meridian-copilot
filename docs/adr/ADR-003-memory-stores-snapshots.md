@@ -8,7 +8,7 @@ Memory Stores ContextSnapshots
 
 ## Status
 
-Proposed
+Accepted
 
 ---
 
