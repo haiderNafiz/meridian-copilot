@@ -4,6 +4,7 @@ import { enrichmentClient } from "./enrichmentClient.js";
 import { retrievalClient } from "./retrievalClient.js";
 import { qualificationClient } from "./qualificationClient.js";
 import { summarizationClient } from "./summarizationClient.js";
+import { contextBuilderClient } from "./contextBuilderClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -162,6 +163,54 @@ export const intelligenceGateway = {
     console.log(`[Intelligence Gateway] Routing summarizeCandidate - TraceID: ${context.trace_id}`);
 
     return summarizationClient.summarizeCandidate(rawText, jobDescriptionId, email, location, technologyKeywords, context);
+  },
+
+  /**
+   * Facade method for Context Builder snapshot composition.
+   * @param {string} contextId - Immutable snapshot context ID.
+   * @param {string[]} documentReferences - References list.
+   * @param {string} [sessionId] - Conversational session code.
+   * @param {string} [rawText] - Optional transient text content.
+   * @param {Object} [candidateProfile] - Extracted candidate profile.
+   * @param {Object} [candidateEnrichment] - Deterministic enrichments.
+   * @param {Object[]} [retrievedContext] - Vector DB chunks.
+   * @param {Object} [qualificationScores] - Scorer scores.
+   * @param {Object} [recruiterSummary] - Recruiter evaluation summary.
+   * @param {Object} [jobContextData] - Session tracing values.
+   * @returns {Promise<Object>} Composed ContextSnapshot.
+   */
+  async buildContext(
+    contextId,
+    documentReferences,
+    sessionId = null,
+    rawText = null,
+    candidateProfile = null,
+    candidateEnrichment = null,
+    retrievedContext = null,
+    qualificationScores = null,
+    recruiterSummary = null,
+    jobContextData = {}
+  ) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing buildContext - TraceID: ${context.trace_id}`);
+
+    return contextBuilderClient.buildContext(
+      contextId,
+      documentReferences,
+      sessionId,
+      rawText,
+      candidateProfile,
+      candidateEnrichment,
+      retrievedContext,
+      qualificationScores,
+      recruiterSummary,
+      context
+    );
   },
 
   /**

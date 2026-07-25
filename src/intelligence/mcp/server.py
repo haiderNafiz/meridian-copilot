@@ -16,6 +16,8 @@ from src.intelligence.tools.qualification_scorer.schema import QualificationInpu
 from src.intelligence.tools.qualification_scorer.service import get_qualification_scorer_service
 from src.intelligence.tools.summarizer.schema import SummarizationInput
 from src.intelligence.tools.summarizer.service import get_summarization_service
+from src.intelligence.tools.context_builder.schema import ContextBuilderInput
+from src.intelligence.tools.context_builder.service import get_context_builder_service
 from src.intelligence.platform.telemetry import mcp_telemetry
 from src.intelligence.platform.metadata import ResponseMetadata
 
@@ -244,6 +246,53 @@ async def summarize_candidate(
             technology_keywords=technology_keywords
         )
         service = get_summarization_service()
+        result = service.process(input_data)
+        collector.metadata = result.metadata
+        return result.model_dump_json()
+
+@mcp.tool(
+    name="build_context",
+    description="Compose structured outputs from Phase 2 services into an immutable, segmented ContextSnapshot."
+)
+async def build_context(
+    context_id: str,
+    document_references: list,
+    session_id: Optional[str] = None,
+    raw_text: Optional[str] = None,
+    candidate_profile: Optional[dict] = None,
+    candidate_enrichment: Optional[dict] = None,
+    retrieved_context: Optional[list] = None,
+    qualification_scores: Optional[dict] = None,
+    recruiter_summary: Optional[dict] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Compose structured candidate attributes into an immutable ContextSnapshot.
+    """
+    with mcp_telemetry("build_context", context) as collector:
+        from src.intelligence.tools.candidate_profiler.schema import CandidateOutput
+        from src.intelligence.tools.deterministic_enricher.schema import EnrichmentOutput
+        from src.intelligence.tools.qualification_scorer.schema import QualificationPayload
+        from src.intelligence.tools.summarizer.schema import SummarizationPayload
+        
+        profile_model = CandidateOutput.model_validate(candidate_profile) if candidate_profile else None
+        enrich_model = EnrichmentOutput.model_validate(candidate_enrichment) if candidate_enrichment else None
+        scores_model = QualificationPayload.model_validate(qualification_scores) if qualification_scores else None
+        summary_model = SummarizationPayload.model_validate(recruiter_summary) if recruiter_summary else None
+        
+        input_data = ContextBuilderInput(
+            context_id=context_id,
+            session_id=session_id,
+            document_references=document_references,
+            raw_text=raw_text,
+            candidate_profile=profile_model,
+            candidate_enrichment=enrich_model,
+            retrieved_context=retrieved_context,
+            qualification_scores=scores_model,
+            recruiter_summary=summary_model
+        )
+        
+        service = get_context_builder_service()
         result = service.process(input_data)
         collector.metadata = result.metadata
         return result.model_dump_json()
