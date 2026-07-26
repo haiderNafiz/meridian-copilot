@@ -1,12 +1,12 @@
 [
   {
     "metadata": {
-      "memory_id": "c84b1f72-8271-4a33-80a2-57b7689f1c0a",
+      "memory_id": "21afaf95-d1a8-4963-94b5-c9395b908823",
       "context_id": "ctx_mcp_save_1",
       "session_id": "session_mcp_99",
       "parent_memory_id": null,
-      "created_at": "2026-07-25T19:56:47.430630Z",
-      "last_accessed_at": "2026-07-25T19:56:47.430630Z",
+      "created_at": "2026-07-26T07:56:06.793173Z",
+      "last_accessed_at": "2026-07-26T07:56:06.793173Z",
       "access_count": 1,
       "tags": [
         "go_lang"
@@ -56,6 +56,197 @@
       "outputs": {
         "qualification_scores": null,
         "recruiter_summary": null
+      }
+    }
+  },
+  {
+    "metadata": {
+      "memory_id": "31cd4ed8-f9cd-48b8-b763-0ba58525fd3d",
+      "context_id": "f286b5c5-11d6-4dd5-a80d-4f3bbc23f78e",
+      "session_id": "session_node_orch_e2e_88",
+      "parent_memory_id": null,
+      "created_at": "2026-07-26T07:59:53.847235Z",
+      "last_accessed_at": "2026-07-26T07:59:53.847235Z",
+      "access_count": 2,
+      "tags": [
+        "Cloud Infrastructure",
+        "AWS",
+        "Go"
+      ],
+      "importance": 0.8,
+      "version": "1.0.0",
+      "is_pinned": false,
+      "is_archived": false
+    },
+    "snapshot": {
+      "metadata": {
+        "context_id": "f286b5c5-11d6-4dd5-a80d-4f3bbc23f78e",
+        "session_id": "session_node_orch_e2e_88",
+        "schema_version": "1.0.0",
+        "timestamp_utc": "2026-07-26T07:59:53.830855Z",
+        "provenance": [
+          "CandidateProfilerService",
+          "DeterministicEnrichmentService",
+          "KnowledgeService",
+          "QualificationScorerService",
+          "SummarizationService"
+        ],
+        "overall_confidence": 0.7666666666666666
+      },
+      "inputs": {
+        "document_references": [],
+        "raw_text": "Larry is a senior Go architect with 8 years experience. He has AWS certification and is open to passive roles."
+      },
+      "facts": {
+        "role_type": "Backend",
+        "seniority": "Senior",
+        "technical_domains": [
+          "Cloud Infrastructure"
+        ],
+        "normalized_technologies": [
+          "AWS",
+          "Go"
+        ],
+        "timezone": "Europe/London",
+        "country": null
+      },
+      "evidence": {
+        "profile_evidence": [
+          "senior Go architect",
+          "8 years experience",
+          "AWS certification"
+        ],
+        "scoring_evidence": {
+          "skill_match": [
+            "Candidate has experience with Go",
+            "Candidate has experience with AWS"
+          ],
+          "experience_match": [
+            "Candidate has 5+ years of experience in Cloud Infrastructure"
+          ],
+          "seniority_match": [
+            "Candidate is described as a senior backend developer"
+          ],
+          "domain_match": [
+            "Candidate has experience in Cloud Infrastructure"
+          ],
+          "location_compatibility": [],
+          "employment_type_compatibility": [],
+          "availability_urgency": [],
+          "overall_qualification": []
+        }
+      },
+      "reasoning": {
+        "scoring_reasoning": {
+          "skill_match": "Candidate has relevant technical skills in Go and AWS, but lacks experience with Docker, Python, and other required technologies.",
+          "experience_match": "Candidate has significant experience in Cloud Infrastructure, but the exact years of experience are not specified.",
+          "seniority_match": "Candidate's seniority level matches the target role's seniority level.",
+          "domain_match": "Candidate's technical domain matches the target role's technical domain.",
+          "location_compatibility": "Candidate's location is not provided, making it incompatible with the target role's location.",
+          "employment_type_compatibility": "Candidate's employment type is not provided, making it incompatible with the target role's employment type.",
+          "availability_urgency": "Candidate is a passive looker, which does not match the target role's urgency level.",
+          "overall_qualification": "Candidate has some relevant skills and experience, but lacks in other areas, resulting in a moderate overall qualification score."
+        },
+        "summary_reasoning": "The candidate has relevant technical skills in Go and AWS, but lacks experience in Docker, Python, and other required technologies. They have significant experience in Cloud Infrastructure and match the target role's seniority level.",
+        "weaknesses_or_risks": "The candidate's lack of experience in required technologies, missing location and employment type information, and passive looker status make them a risk for the role.",
+        "recruiter_recommendation": "Further evaluation is required to determine the candidate's overall qualification. It is recommended to conduct a thorough interview to assess their skills and experience in more detail."
+      },
+      "outputs": {
+        "qualification_scores": {
+          "scores": {
+            "skill_match": {
+              "score": 0.6,
+              "confidence": 0.8,
+              "evidence": [
+                "Candidate has experience with Go",
+                "Candidate has experience with AWS"
+              ],
+              "reasoning": "Candidate has relevant technical skills in Go and AWS, but lacks experience with Docker, Python, and other required technologies."
+            },
+            "experience_match": {
+              "score": 0.4,
+              "confidence": 0.6,
+              "evidence": [
+                "Candidate has 5+ years of experience in Cloud Infrastructure"
+              ],
+              "reasoning": "Candidate has significant experience in Cloud Infrastructure, but the exact years of experience are not specified."
+            },
+            "seniority_match": {
+              "score": 0.8,
+              "confidence": 0.9,
+              "evidence": [
+                "Candidate is described as a senior backend developer"
+              ],
+              "reasoning": "Candidate's seniority level matches the target role's seniority level."
+            },
+            "domain_match": {
+              "score": 0.8,
+              "confidence": 0.9,
+              "evidence": [
+                "Candidate has experience in Cloud Infrastructure"
+              ],
+              "reasoning": "Candidate's technical domain matches the target role's technical domain."
+            },
+            "location_compatibility": {
+              "score": 0.0,
+              "confidence": 0.0,
+              "evidence": [],
+              "reasoning": "Candidate's location is not provided, making it incompatible with the target role's location."
+            },
+            "employment_type_compatibility": {
+              "score": 0.0,
+              "confidence": 0.0,
+              "evidence": [],
+              "reasoning": "Candidate's employment type is not provided, making it incompatible with the target role's employment type."
+            },
+            "availability_urgency": {
+              "score": 0.0,
+              "confidence": 0.0,
+              "evidence": [],
+              "reasoning": "Candidate is a passive looker, which does not match the target role's urgency level."
+            },
+            "overall_qualification": {
+              "score": 0.5,
+              "confidence": 0.7,
+              "evidence": [],
+              "reasoning": "Candidate has some relevant skills and experience, but lacks in other areas, resulting in a moderate overall qualification score."
+            }
+          },
+          "reconciliation_notes": "Candidate has some relevant skills and experience, but lacks in other areas, such as location, employment type, and availability urgency. Further evaluation is required to determine the candidate's overall qualification."
+        },
+        "recruiter_summary": {
+          "summary_type": "candidate",
+          "executive_summary": "The candidate has relevant technical skills in Go and AWS, but lacks experience in Docker, Python, and other required technologies. They have significant experience in Cloud Infrastructure and match the target role's seniority level.",
+          "strengths": {
+            "evidence": [
+              "8 years experience",
+              "senior Go architect",
+              "AWS certification",
+              "Cloud Infrastructure experience"
+            ],
+            "reasoning": "The candidate's extensive experience, technical skills, and seniority level make them a strong candidate for the role."
+          },
+          "weaknesses_or_risks": {
+            "evidence": [
+              "Docker, Python, and other required technologies are not mentioned in the candidate's profile",
+              "Location is not provided, making it incompatible with the target role's location",
+              "Employment type is not provided, making it incompatible with the target role's employment type",
+              "Candidate is a passive looker, which does not match the target role's urgency level"
+            ],
+            "reasoning": "The candidate's lack of experience in required technologies, missing location and employment type information, and passive looker status make them a risk for the role."
+          },
+          "recruiter_recommendation": "Further evaluation is required to determine the candidate's overall qualification. It is recommended to conduct a thorough interview to assess their skills and experience in more detail.",
+          "interview_focus": [
+            "Technical skills in Go and AWS",
+            "Cloud Infrastructure experience",
+            "Seniority level and leadership skills"
+          ],
+          "follow_up_questions": [
+            "Can you provide examples of your experience with Docker and Python?",
+            "How do you stay up-to-date with the latest technologies and trends in Cloud Infrastructure?",
+            "Can you describe your experience with leadership and mentoring in a technical role?"
+          ]
+        }
       }
     }
   }

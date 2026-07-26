@@ -6,6 +6,7 @@ import { qualificationClient } from "./qualificationClient.js";
 import { summarizationClient } from "./summarizationClient.js";
 import { contextBuilderClient } from "./contextBuilderClient.js";
 import { memoryClient } from "./memoryClient.js";
+import { orchestratorClient } from "./orchestratorClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -239,6 +240,39 @@ export const intelligenceGateway = {
     context.trace_id = context.trace_id || `tr_${Math.floor(Math.random() * 1000000)}`;
     console.log(`[Intelligence Gateway] Routing searchMemory - TraceID: ${context.trace_id}`);
     return memoryClient.searchMemory(queryText, sessionId, tags, importanceThreshold, limit, context);
+  },
+
+  /**
+   * Facade method for the Agent Orchestrator pipeline execution.
+   */
+  async runOrchestration(
+    queryText,
+    sessionId = null,
+    contextId = null,
+    forceTools = [],
+    email = null,
+    location = null,
+    technologyKeywords = [],
+    jobContextData = {}
+  ) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing runOrchestration - TraceID: ${context.trace_id}`);
+
+    return orchestratorClient.runOrchestration(
+      queryText,
+      sessionId,
+      contextId,
+      forceTools,
+      email,
+      location,
+      technologyKeywords,
+      context
+    );
   },
 
   /**

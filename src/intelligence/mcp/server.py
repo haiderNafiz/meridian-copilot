@@ -380,6 +380,41 @@ async def search_memory(
         collector.metadata = result.metadata
         return result.model_dump_json()
 
+@mcp.tool(
+    name="run_orchestrator",
+    description="Execute the full candidate assessment and context building pipeline."
+)
+async def run_orchestrator(
+    query_text: str,
+    session_id: Optional[str] = None,
+    context_id: Optional[str] = None,
+    force_tools: Optional[list] = None,
+    email: Optional[str] = None,
+    location: Optional[str] = None,
+    technology_keywords: Optional[list] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Execute the full candidate assessment pipeline.
+    """
+    with mcp_telemetry("run_orchestrator", context) as collector:
+        from src.intelligence.tools.agent_orchestrator.schema import OrchestrationRequest
+        from src.intelligence.tools.agent_orchestrator.service import get_agent_orchestrator_service
+        
+        input_data = OrchestrationRequest(
+            query_text=query_text,
+            session_id=session_id,
+            context_id=context_id,
+            force_tools=force_tools or [],
+            email=email,
+            location=location,
+            technology_keywords=technology_keywords or []
+        )
+        service = get_agent_orchestrator_service()
+        result = service.process(input_data)
+        collector.metadata = result.metadata
+        return result.model_dump_json()
+
 if __name__ == "__main__":
     # Start the server using stdio transport
     mcp.run()
