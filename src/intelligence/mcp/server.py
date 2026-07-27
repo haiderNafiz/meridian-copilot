@@ -548,6 +548,42 @@ async def assess_opportunity(
             collector.metadata = result.metadata
         return result.model_dump_json()
 
+@mcp.tool(
+    name="run_revenue_copilot",
+    description="Translate OpportunityAssessment into playbook categories, draft communications, and task checklists."
+)
+async def run_revenue_copilot(
+    opportunity_assessment: dict,
+    context_snapshot: dict,
+    conversation_context: Optional[dict] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Produce structured business guidance recommendations from an OpportunityAssessment.
+    """
+    with mcp_telemetry("run_revenue_copilot", context) as collector:
+        from src.intelligence.tools.context_builder.schema import ContextSnapshot
+        from src.intelligence.tools.conversation_memory.schema import ConversationContext
+        from src.intelligence.tools.opportunity_intelligence.schema import OpportunityAssessment
+        from src.intelligence.tools.revenue_copilot.schema import RevenueCopilotRequest
+        from src.intelligence.tools.revenue_copilot.service import get_revenue_copilot_service
+        
+        assess_model = OpportunityAssessment.model_validate(opportunity_assessment)
+        snapshot_model = ContextSnapshot.model_validate(context_snapshot)
+        conv_model = ConversationContext.model_validate(conversation_context) if conversation_context else None
+        
+        req = RevenueCopilotRequest(
+            opportunity_assessment=assess_model,
+            context_snapshot=snapshot_model,
+            conversation_context=conv_model
+        )
+        
+        result = get_revenue_copilot_service().run(req)
+        
+        if hasattr(result, "metadata") and result.metadata:
+            collector.metadata = result.metadata
+        return result.model_dump_json()
+
 if __name__ == "__main__":
     # Start the server using stdio transport
     mcp.run()

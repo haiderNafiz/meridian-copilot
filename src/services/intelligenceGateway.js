@@ -10,6 +10,7 @@ import { orchestratorClient } from "./orchestratorClient.js";
 import { plannerClient } from "./plannerClient.js";
 import { conversationMemoryClient } from "./conversationMemoryClient.js";
 import { opportunityIntelligenceClient } from "./opportunityIntelligenceClient.js";
+import { revenueCopilotClient } from "./revenueCopilotClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -393,6 +394,31 @@ export const intelligenceGateway = {
       contextSnapshot,
       conversationContext,
       assessmentType,
+      context
+    );
+  },
+
+  /**
+   * Facade method to generate playbooks and recommendations via revenue copilot.
+   * @param {Object} opportunityAssessment - Preceding opportunity evaluation.
+   * @param {Object} contextSnapshot - Context snapshot data.
+   * @param {Object|null} [conversationContext] - Optional memory context.
+   * @param {Object} [jobContextData] - Tracing context metrics.
+   * @returns {Promise<Object>} Mapped copilot recommendation.
+   */
+  async runRevenueCopilot(opportunityAssessment, contextSnapshot, conversationContext = null, jobContextData = {}) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing runRevenueCopilot - TraceID: ${context.trace_id}`);
+
+    return revenueCopilotClient.runRevenueCopilot(
+      opportunityAssessment,
+      contextSnapshot,
+      conversationContext,
       context
     );
   },

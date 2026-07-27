@@ -1,12 +1,12 @@
 [
   {
     "metadata": {
-      "memory_id": "9aaa12c9-40a4-4796-a257-958ad8ad6632",
+      "memory_id": "5b5b19b8-31e0-46ed-a7ba-93ef32119d13",
       "context_id": "ctx_mcp_save_1",
       "session_id": "session_mcp_99",
       "parent_memory_id": null,
-      "created_at": "2026-07-27T17:06:06.174586Z",
-      "last_accessed_at": "2026-07-27T17:06:06.174586Z",
+      "created_at": "2026-07-27T19:21:31.500582Z",
+      "last_accessed_at": "2026-07-27T19:21:31.500582Z",
       "access_count": 1,
       "tags": [
         "go_lang"
