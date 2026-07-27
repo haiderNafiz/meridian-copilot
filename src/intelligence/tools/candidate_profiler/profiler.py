@@ -1,19 +1,30 @@
-from .schema import CandidateInput, CandidateOutput
-from .providers.base import CandidateProfilerProvider
-from .providers.groq_provider import GroqProvider
-from typing import Tuple
+from typing import Tuple, Any
+from .schema import CandidateInput, CandidateProfile, EntityProfile
+from .strategy.base import ProfileExtractionStrategy
+from .strategy.candidate import CandidateProfileStrategy
 
 class CandidateProfilerService:
-    def __init__(self, provider: CandidateProfilerProvider = None):
-        # Default to GroqProvider if not supplied (standard dependency injection)
-        self.provider = provider if provider is not None else GroqProvider()
+    def __init__(self, strategy: ProfileExtractionStrategy = None):
+        # Default to CandidateProfileStrategy if not supplied
+        self.strategy = strategy if strategy is not None else CandidateProfileStrategy()
 
-    def profile(self, input_data: CandidateInput) -> Tuple[CandidateOutput, float]:
-        """
-        Profiles the candidate profile using the configured provider.
-        Returns a tuple of (CandidateOutput, provider_latency_ms).
-        """
-        return self.provider.profile(input_data)
+    @property
+    def provider(self):
+        return getattr(self.strategy, "provider", None)
 
-def get_candidate_profiler_service(provider: CandidateProfilerProvider = None) -> CandidateProfilerService:
-    return CandidateProfilerService(provider)
+    def profile(self, input_data: Any) -> Tuple[EntityProfile, float]:
+        """
+        Profiles the candidate/entity using the configured strategy.
+        Returns a tuple of (EntityProfile, provider_latency_ms).
+        """
+        return self.strategy.extract(input_data)
+
+def get_candidate_profiler_service(strategy_or_provider: Any = None) -> CandidateProfilerService:
+    if strategy_or_provider is not None:
+        if isinstance(strategy_or_provider, ProfileExtractionStrategy):
+            return CandidateProfilerService(strategy=strategy_or_provider)
+        else:
+            # Treat as legacy provider and wrap in CandidateProfileStrategy
+            strategy = CandidateProfileStrategy(provider=strategy_or_provider)
+            return CandidateProfilerService(strategy=strategy)
+    return CandidateProfilerService()

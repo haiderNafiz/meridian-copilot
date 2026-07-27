@@ -13,6 +13,7 @@ This directory contains Architecture Decision Records tracking major design deci
 | [ADR-005](ADR-005-planning-separated-from-execution.md) | Planning Is Separated from Execution | Accepted | 2026-07-27 |
 | [ADR-006](ADR-006-separate-long-term-memory-from-conversation-memory.md) | Separate Long-Term Memory from Conversation Memory | Accepted | 2026-07-27 |
 | [ADR-007](ADR-007-opportunity-intelligence.md) | Opportunity Intelligence is Decoupled and Strategy-Driven | Accepted | 2026-07-27 |
+| [ADR-008](ADR-008-generalize-profiler-and-scorer.md) | Generalizing Profiler and Scorer Services via Strategy Patterns | Accepted | 2026-07-27 |
 
 ---
 

@@ -230,3 +230,40 @@ def test_mcp_score_qualification_success():
     assert log["provider"] == "groq"
     assert log["model"] == "llama-3.3-70b-versatile"
     assert log["status"] == "success"
+
+def test_scorer_strategy_injection():
+    from src.intelligence.tools.qualification_scorer.strategy.candidate import CandidateQualificationStrategy
+    from src.intelligence.tools.qualification_scorer.strategy.base import QualificationStrategy
+    from src.intelligence.tools.qualification_scorer.service import get_qualification_scorer_service, QualificationScorerService
+    from src.intelligence.tools.qualification_scorer.schema import QualificationInput, QualificationOutput
+    from src.intelligence.platform.contracts import ResponseStatus
+    from src.intelligence.platform.metadata import ResponseMetadata
+
+    # 1. Verify default strategy is Candidate
+    # We clear the singleton instance if any, or just check the class of the default constructed one
+    service_default = get_qualification_scorer_service()
+    assert isinstance(service_default.strategy, CandidateQualificationStrategy)
+
+    # 2. Test mock strategy injection
+    class MockQualStrategy(QualificationStrategy):
+        def qualify(self, request):
+            meta = ResponseMetadata(
+                provider="mock", model="m", prompt_version="1", confidence=1.0, fallback_used=False, provider_latency_ms=0.0
+            )
+            from src.intelligence.tools.qualification_scorer.schema import QualificationPayload
+            dummy_payload = QualificationPayload(scores={}, reconciliation_notes="Mock notes")
+            return QualificationOutput(
+                status=ResponseStatus.SUCCESS,
+                metadata=meta,
+                payload=dummy_payload,
+                retrieved_chunks=[],
+                provider_chain=["MockStrategy"]
+            )
+
+    mock_strat = MockQualStrategy()
+    service_custom = QualificationScorerService(strategy=mock_strat)
+    assert service_custom.strategy is mock_strat
+
+    res = service_custom.process(QualificationInput(raw_text="dummy", job_description_id="jd1"))
+    assert res.status == ResponseStatus.SUCCESS
+    assert res.provider_chain == ["MockStrategy"]

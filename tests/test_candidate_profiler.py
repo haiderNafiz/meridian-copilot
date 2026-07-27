@@ -148,3 +148,26 @@ def test_mcp_profile_candidate_validation_failure():
     assert "Validation Error" in failure_log["error"]
     assert "model" in failure_log
     assert "prompt_version" == "prompt_version" or "prompt_version" in failure_log
+
+def test_profiler_strategy_injection():
+    from src.intelligence.tools.candidate_profiler.strategy.candidate import CandidateProfileStrategy
+    from src.intelligence.tools.candidate_profiler.schema import EntityType, EntityProfile
+    from src.intelligence.tools.candidate_profiler.strategy.base import ProfileExtractionStrategy
+    
+    # 1. Verify default strategy is Candidate
+    service_default = get_candidate_profiler_service()
+    assert isinstance(service_default.strategy, CandidateProfileStrategy)
+    
+    # 2. Test mock strategy injection
+    class MockProfileStrategy(ProfileExtractionStrategy):
+        def extract(self, input_data):
+            return EntityProfile(entity_type=EntityType.LEAD, contacts=["test@lead.com"]), 10.0
+            
+    mock_strat = MockProfileStrategy()
+    service_custom = get_candidate_profiler_service(mock_strat)
+    assert service_custom.strategy is mock_strat
+    
+    res, lat = service_custom.profile("dummy")
+    assert res.entity_type == EntityType.LEAD
+    assert res.contacts == ["test@lead.com"]
+    assert lat == 10.0
