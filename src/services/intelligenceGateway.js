@@ -8,6 +8,7 @@ import { contextBuilderClient } from "./contextBuilderClient.js";
 import { memoryClient } from "./memoryClient.js";
 import { orchestratorClient } from "./orchestratorClient.js";
 import { plannerClient } from "./plannerClient.js";
+import { conversationMemoryClient } from "./conversationMemoryClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -314,6 +315,58 @@ export const intelligenceGateway = {
       email,
       location,
       technologyKeywords,
+      context
+    );
+  },
+
+  /**
+   * Facade method to post conversational turn.
+   * @param {string} sessionId - Session ID.
+   * @param {string} role - user or assistant.
+   * @param {string} content - message text.
+   * @param {string|null} [activeGoal] - active goal string.
+   * @param {Object} [jobContextData] - Context markers.
+   * @returns {Promise<Object>} Status result.
+   */
+  async postConversationTurn(sessionId, role, content, activeGoal = null, jobContextData = {}) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing postConversationTurn - TraceID: ${context.trace_id}`);
+
+    return conversationMemoryClient.postConversationTurn(
+      sessionId,
+      role,
+      content,
+      activeGoal,
+      context
+    );
+  },
+
+  /**
+   * Facade method to retrieve consolidated conversation context.
+   * @param {string} sessionId - Session ID.
+   * @param {string|null} [queryText] - Search query.
+   * @param {string|null} [activeGoal] - active goal override.
+   * @param {Object} [jobContextData] - Context markers.
+   * @returns {Promise<Object>} Consolidated context.
+   */
+  async getConversationContext(sessionId, queryText = null, activeGoal = null, jobContextData = {}) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing getConversationContext - TraceID: ${context.trace_id}`);
+
+    return conversationMemoryClient.getConversationContext(
+      sessionId,
+      queryText,
+      activeGoal,
       context
     );
   },

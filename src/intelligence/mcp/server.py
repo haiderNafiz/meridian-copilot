@@ -461,6 +461,56 @@ async def run_planner(
             collector.metadata = result.metadata
         return result.model_dump_json()
 
+@mcp.tool(
+    name="post_conversation_turn",
+    description="Post a new conversational turn (user or assistant) to working memory for a session."
+)
+async def post_conversation_turn(
+    session_id: str,
+    role: str,
+    content: str,
+    active_goal: Optional[str] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Append message turn to session working memory.
+    """
+    with mcp_telemetry("post_conversation_turn", context) as collector:
+        from src.intelligence.tools.conversation_memory.service import get_conversation_memory_service
+        result = get_conversation_memory_service().post_turn(
+            session_id=session_id,
+            role=role,
+            content=content,
+            active_goal=active_goal
+        )
+        if hasattr(result, "metadata") and result.metadata:
+            collector.metadata = result.metadata
+        return result.model_dump_json()
+
+@mcp.tool(
+    name="get_conversation_context",
+    description="Retrieve consolidated conversational context (recent turns, memories, unresolved questions) for a session."
+)
+async def get_conversation_context(
+    session_id: str,
+    query_text: Optional[str] = None,
+    active_goal: Optional[str] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Retrieve consolidated session conversation context for planner consumption.
+    """
+    with mcp_telemetry("get_conversation_context", context) as collector:
+        from src.intelligence.tools.conversation_memory.service import get_conversation_memory_service
+        result = get_conversation_memory_service().get_context(
+            session_id=session_id,
+            query_text=query_text,
+            active_goal=active_goal
+        )
+        if hasattr(result, "metadata") and result.metadata:
+            collector.metadata = result.metadata
+        return result.model_dump_json()
+
 if __name__ == "__main__":
     # Start the server using stdio transport
     mcp.run()
