@@ -511,6 +511,43 @@ async def get_conversation_context(
             collector.metadata = result.metadata
         return result.model_dump_json()
 
+@mcp.tool(
+    name="assess_opportunity",
+    description="Analyze structured snapshot outputs and produce an evidence-backed OpportunityAssessment."
+)
+async def assess_opportunity(
+    context_snapshot: dict,
+    conversation_context: Optional[dict] = None,
+    assessment_type: Optional[str] = "candidate",
+    context: Optional[dict] = None
+) -> str:
+    """
+    Produce an evidence-backed OpportunityAssessment from preceding structured outputs.
+    """
+    with mcp_telemetry("assess_opportunity", context) as collector:
+        from src.intelligence.tools.context_builder.schema import ContextSnapshot
+        from src.intelligence.tools.conversation_memory.schema import ConversationContext
+        from src.intelligence.tools.opportunity_intelligence.schema import AssessmentType
+        from src.intelligence.tools.opportunity_intelligence.service import get_opportunity_intelligence_service
+        
+        snapshot_model = ContextSnapshot.model_validate(context_snapshot)
+        conv_model = ConversationContext.model_validate(conversation_context) if conversation_context else None
+        
+        try:
+            type_enum = AssessmentType(assessment_type)
+        except ValueError:
+            type_enum = AssessmentType.CANDIDATE
+            
+        result = get_opportunity_intelligence_service().assess(
+            context_snapshot=snapshot_model,
+            conversation_context=conv_model,
+            assessment_type=type_enum
+        )
+        
+        if hasattr(result, "metadata") and result.metadata:
+            collector.metadata = result.metadata
+        return result.model_dump_json()
+
 if __name__ == "__main__":
     # Start the server using stdio transport
     mcp.run()

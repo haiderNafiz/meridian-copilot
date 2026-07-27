@@ -12,6 +12,7 @@ This directory contains Architecture Decision Records tracking major design deci
 | [ADR-004](ADR-004-agent-orchestrator.md) | Agent Orchestrator coordinates execution | Accepted | 2026-07-27 |
 | [ADR-005](ADR-005-planning-separated-from-execution.md) | Planning Is Separated from Execution | Accepted | 2026-07-27 |
 | [ADR-006](ADR-006-separate-long-term-memory-from-conversation-memory.md) | Separate Long-Term Memory from Conversation Memory | Accepted | 2026-07-27 |
+| [ADR-007](ADR-007-opportunity-intelligence.md) | Opportunity Intelligence is Decoupled and Strategy-Driven | Accepted | 2026-07-27 |
 
 ---
 

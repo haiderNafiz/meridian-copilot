@@ -9,6 +9,7 @@ import { memoryClient } from "./memoryClient.js";
 import { orchestratorClient } from "./orchestratorClient.js";
 import { plannerClient } from "./plannerClient.js";
 import { conversationMemoryClient } from "./conversationMemoryClient.js";
+import { opportunityIntelligenceClient } from "./opportunityIntelligenceClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -367,6 +368,31 @@ export const intelligenceGateway = {
       sessionId,
       queryText,
       activeGoal,
+      context
+    );
+  },
+
+  /**
+   * Facade method to evaluate opportunities with opportunity intelligence tool.
+   * @param {Object} contextSnapshot - context builder output payload.
+   * @param {Object|null} [conversationContext] - dialog memory context.
+   * @param {string} [assessmentType] - target strategy type enum.
+   * @param {Object} [jobContextData] - Context markers.
+   * @returns {Promise<Object>} Mapped assessment result.
+   */
+  async assessOpportunity(contextSnapshot, conversationContext = null, assessmentType = "candidate", jobContextData = {}) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing assessOpportunity - TraceID: ${context.trace_id}`);
+
+    return opportunityIntelligenceClient.assessOpportunity(
+      contextSnapshot,
+      conversationContext,
+      assessmentType,
       context
     );
   },
