@@ -4,69 +4,35 @@ from ..schema import ExecutionPlan, ExecutionNode, OrchestrationRequest
 
 class DefaultPlanResolver(PlanResolver):
     def resolve_plan(self, request: OrchestrationRequest) -> ExecutionPlan:
-        nodes = []
         if request.force_tools:
+            nodes = []
             for t in request.force_tools:
                 nodes.append(ExecutionNode(tool_name=t))
-        else:
-            nodes.extend([
-                ExecutionNode(
-                    tool_name="intent_classifier",
-                    arguments_mapping={"query_text": "initial_query"}
-                ),
-                ExecutionNode(
-                    tool_name="candidate_profiler",
-                    arguments_mapping={"raw_text": "initial_query"}
-                ),
-                ExecutionNode(
-                    tool_name="deterministic_enricher",
-                    arguments_mapping={
-                        "email": "email",
-                        "location": "location",
-                        "technology_keywords": "technology_keywords",
-                        "candidate_profile": "candidate_profiler"
-                    }
-                ),
-                ExecutionNode(
-                    tool_name="knowledge_service",
-                    arguments_mapping={"query_text": "initial_query"}
-                ),
-                ExecutionNode(
-                    tool_name="qualification_scorer",
-                    arguments_mapping={
-                        "candidate_profile": "candidate_profiler",
-                        "candidate_enrichment": "deterministic_enricher",
-                        "retrieved_context": "knowledge_service"
-                    }
-                ),
-                ExecutionNode(
-                    tool_name="summarizer",
-                    arguments_mapping={
-                        "candidate_profile": "candidate_profiler",
-                        "candidate_enrichment": "deterministic_enricher",
-                        "retrieved_context": "knowledge_service",
-                        "qualification_scores": "qualification_scorer"
-                    }
-                ),
-                ExecutionNode(
-                    tool_name="context_builder",
-                    arguments_mapping={
-                        "context_id": "context_id",
-                        "session_id": "session_id",
-                        "raw_text": "initial_query",
-                        "candidate_profile": "candidate_profiler",
-                        "candidate_enrichment": "deterministic_enricher",
-                        "retrieved_context": "knowledge_service",
-                        "qualification_scores": "qualification_scorer",
-                        "recruiter_summary": "summarizer"
-                    }
-                ),
-                ExecutionNode(
-                    tool_name="save_memory",
-                    arguments_mapping={
-                        "snapshot": "context_builder.payload",
-                        "session_id": "session_id"
-                    }
-                )
-            ])
-        return ExecutionPlan(plan_id=str(uuid.uuid4()), nodes=nodes)
+            return ExecutionPlan(plan_id=str(uuid.uuid4()), nodes=nodes)
+            
+        from src.intelligence.tools.planner.service import get_planner_service
+        from src.intelligence.tools.planner.schema import PlannerRequest
+        from src.intelligence.tools.agent_orchestrator.service import get_agent_orchestrator_service
+        
+        planner_req = PlannerRequest(
+            query_text=request.query_text,
+            session_id=request.session_id,
+            context_id=request.context_id,
+            email=request.email,
+            location=request.location,
+            technology_keywords=request.technology_keywords
+        )
+        
+        # Get active tools for validation
+        orchestrator = get_agent_orchestrator_service()
+        tools = orchestrator.provider.registry.get_all_tools()
+        
+        result = get_planner_service().plan(
+            request=planner_req,
+            available_tools=tools
+        )
+        
+        if result.status == "failure":
+            raise ValueError(f"Planning failure [Code: {result.error_code}]: {result.message}. Details: {getattr(result, 'missing_details', [])}")
+            
+        return result.execution_plan

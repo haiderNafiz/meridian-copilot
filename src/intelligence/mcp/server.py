@@ -415,6 +415,52 @@ async def run_orchestrator(
         collector.metadata = result.metadata
         return result.model_dump_json()
 
+@mcp.tool(
+    name="run_planner",
+    description="Analyze request context, check constraints, select workflow template, and return a validated ExecutionPlan."
+)
+async def run_planner(
+    query_text: str,
+    session_id: Optional[str] = None,
+    context_id: Optional[str] = None,
+    force_workflow: Optional[str] = None,
+    email: Optional[str] = None,
+    location: Optional[str] = None,
+    technology_keywords: Optional[list] = None,
+    context: Optional[dict] = None
+) -> str:
+    """
+    Expose PlannerService workflow selection logic over the MCP server protocol.
+    """
+    with mcp_telemetry("run_planner", context) as collector:
+        from src.intelligence.tools.planner.schema import PlannerRequest
+        from src.intelligence.tools.planner.service import get_planner_service
+        
+        input_data = PlannerRequest(
+            query_text=query_text,
+            session_id=session_id,
+            context_id=context_id,
+            force_workflow=force_workflow,
+            email=email,
+            location=location,
+            technology_keywords=technology_keywords or []
+        )
+        
+        # Retrieve tools from orchestrator singleton to satisfy available list checking
+        from src.intelligence.tools.agent_orchestrator.service import get_agent_orchestrator_service
+        orchestrator = get_agent_orchestrator_service()
+        tools = orchestrator.provider.registry.get_all_tools()
+        
+        result = get_planner_service().plan(
+            request=input_data,
+            available_tools=tools
+        )
+        
+        # Set collector metadata if success
+        if hasattr(result, "metadata") and result.metadata:
+            collector.metadata = result.metadata
+        return result.model_dump_json()
+
 if __name__ == "__main__":
     # Start the server using stdio transport
     mcp.run()

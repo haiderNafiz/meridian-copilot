@@ -9,6 +9,8 @@ This directory contains Architecture Decision Records tracking major design deci
 | [ADR-001](ADR-001-context-builder.md) | Context Builder is a Pure Composition Service | Accepted | 2026-07-25 |
 | [ADR-002](ADR-002-context-snapshot.md) | ContextSnapshot is the Canonical State Object | Accepted | 2026-07-25 |
 | [ADR-003](ADR-003-memory-stores-snapshots.md) | Memory Stores ContextSnapshots | Proposed | 2026-07-25 |
+| [ADR-004](ADR-004-agent-orchestrator.md) | Agent Orchestrator coordinates execution | Accepted | 2026-07-27 |
+| [ADR-005](ADR-005-planning-separated-from-execution.md) | Planning Is Separated from Execution | Accepted | 2026-07-27 |
 
 ---
 

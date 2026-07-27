@@ -7,6 +7,7 @@ import { summarizationClient } from "./summarizationClient.js";
 import { contextBuilderClient } from "./contextBuilderClient.js";
 import { memoryClient } from "./memoryClient.js";
 import { orchestratorClient } from "./orchestratorClient.js";
+import { plannerClient } from "./plannerClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -268,6 +269,48 @@ export const intelligenceGateway = {
       sessionId,
       contextId,
       forceTools,
+      email,
+      location,
+      technologyKeywords,
+      context
+    );
+  },
+
+  /**
+   * Facade method for running the planner service.
+   * @param {string} queryText - Raw user query instruction.
+   * @param {string} [sessionId] - Optional session code.
+   * @param {string} [contextId] - Optional preceding context snapshot ID.
+   * @param {string} [forceWorkflow] - Optional enforced workflow name.
+   * @param {string} [email] - Optional candidate email.
+   * @param {string} [location] - Optional candidate location.
+   * @param {string[]} [technologyKeywords] - Optional technology keywords list.
+   * @param {Object} [jobContextData] - Context map containing event_id, job_id, and trace_id.
+   * @returns {Promise<Object>} Planning results response.
+   */
+  async runPlanner(
+    queryText,
+    sessionId = null,
+    contextId = null,
+    forceWorkflow = null,
+    email = null,
+    location = null,
+    technologyKeywords = [],
+    jobContextData = {}
+  ) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing runPlanner - TraceID: ${context.trace_id}`);
+
+    return plannerClient.runPlanner(
+      queryText,
+      sessionId,
+      contextId,
+      forceWorkflow,
       email,
       location,
       technologyKeywords,
