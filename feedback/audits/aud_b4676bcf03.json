@@ -1,0 +1,10 @@
+{
+  "audit_id": "aud_b4676bcf03",
+  "entity_id": "promo_9d5625fc08",
+  "actor_id": "node_admin",
+  "action": "request_promotion",
+  "timestamp": "2026-07-29T17:41:26.374228Z",
+  "changes": {
+    "status": "pending"
+  }
+}

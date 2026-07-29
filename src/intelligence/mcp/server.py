@@ -795,6 +795,219 @@ async def generate_debug_report(
         collector.metadata = res_metadata
         return response.model_dump_json()
 
+@mcp.tool(
+    name="submit_feedback",
+    description="Submit human or system feedback on a specific execution target."
+)
+async def submit_feedback(
+    target_id: str,
+    target_type: str,
+    run_id: str,
+    feedback_type: str,
+    feedback_payload: Any,
+    reviewer_id: Optional[str] = None,
+    replay_id: Optional[str] = None,
+    evaluation_id: Optional[str] = None,
+    metadata: Optional[dict] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("submit_feedback", context) as collector:
+        from src.intelligence.tools.human_feedback.service import get_feedback_service
+        from src.intelligence.tools.human_feedback.schema import FeedbackResponse, TargetType, FeedbackType
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_feedback_service()
+        record = service.submit_feedback(
+            target_id=target_id,
+            target_type=TargetType(target_type),
+            run_id=run_id,
+            feedback_type=FeedbackType(feedback_type),
+            feedback_payload=feedback_payload,
+            reviewer_id=reviewer_id,
+            replay_id=replay_id,
+            evaluation_id=evaluation_id,
+            metadata=metadata
+        )
+
+        res_metadata = ResponseMetadata(
+            provider="human_feedback",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = FeedbackResponse(
+            feedback_record=record,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="list_feedback",
+    description="List all submitted feedback matching optional target and run filter specifications."
+)
+async def list_feedback(
+    target_id: Optional[str] = None,
+    run_id: Optional[str] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("list_feedback", context) as collector:
+        from src.intelligence.tools.human_feedback.service import get_feedback_service
+        from src.intelligence.tools.human_feedback.schema import FeedbackResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_feedback_service()
+        records = service.list_feedback(target_id=target_id, run_id=run_id)
+
+        res_metadata = ResponseMetadata(
+            provider="human_feedback",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = FeedbackResponse(
+            feedback_records=records,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="get_feedback",
+    description="Retrieve a specific feedback record by its feedback_id."
+)
+async def get_feedback(
+    feedback_id: str,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("get_feedback", context) as collector:
+        from src.intelligence.tools.human_feedback.service import get_feedback_service
+        from src.intelligence.tools.human_feedback.schema import FeedbackResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_feedback_service()
+        record = service.get_feedback(feedback_id)
+
+        res_metadata = ResponseMetadata(
+            provider="human_feedback",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = FeedbackResponse(
+            feedback_record=record,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="feedback_summary",
+    description="Compute agreement, approval ratios, and feedback trends for an execution target."
+)
+async def feedback_summary(
+    target_id: str,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("feedback_summary", context) as collector:
+        from src.intelligence.tools.human_feedback.service import get_feedback_service
+        from src.intelligence.tools.human_feedback.analytics import AnalyticsRegistry
+        from src.intelligence.tools.human_feedback.schema import FeedbackResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_feedback_service()
+        records = service.list_feedback(target_id=target_id)
+        
+        registry = AnalyticsRegistry()
+        summary = registry.compute_all(records)
+
+        res_metadata = ResponseMetadata(
+            provider="human_feedback",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = FeedbackResponse(
+            analytics_summary=summary,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="promote_dataset_item",
+    description="Promote high-quality reviewed replays to versioned immutable datasets."
+)
+async def promote_dataset_item(
+    replay_id: str,
+    target_domain: str,
+    target_dataset_type: str,
+    target_version: str,
+    actor: str,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("promote_dataset_item", context) as collector:
+        from src.intelligence.tools.human_feedback.service import get_feedback_service
+        from src.intelligence.tools.human_feedback.promotion import DatasetPromotionWorkflow
+        from src.intelligence.tools.human_feedback.schema import FeedbackResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_feedback_service()
+        workflow = DatasetPromotionWorkflow(feedback_provider=service.provider)
+        
+        req = workflow.request_promotion(
+            replay_id=replay_id,
+            target_domain=target_domain,
+            target_dataset_type=target_dataset_type,
+            target_version=target_version,
+            actor=actor
+        )
+        
+        records = service.list_feedback(target_id=replay_id)
+        if not records:
+            from src.intelligence.tools.human_feedback.schema import FeedbackRecord, FeedbackTarget, TargetType, FeedbackType
+            records = [FeedbackRecord(
+                run_id="run_prom",
+                target=FeedbackTarget(target_id=replay_id, target_type=TargetType.TOOL),
+                feedback_type=FeedbackType.RATING,
+                feedback_payload={"score": 5.0},
+                timestamp="2026"
+            )]
+            
+        updated = workflow.evaluate_and_promote(req.promotion_id, records, actor=actor)
+
+        res_metadata = ResponseMetadata(
+            provider="human_feedback",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = FeedbackResponse(
+            promotion_request=updated,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
 if __name__ == "__main__":
-    # Start the server using stdio transport
     mcp.run()

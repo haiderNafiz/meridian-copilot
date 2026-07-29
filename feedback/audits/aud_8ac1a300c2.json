@@ -1,0 +1,11 @@
+{
+  "audit_id": "aud_8ac1a300c2",
+  "entity_id": "fb_21d286d165",
+  "actor_id": "reviewer_node",
+  "action": "create_feedback",
+  "timestamp": "2026-07-29T17:41:26.206578Z",
+  "changes": {
+    "feedback_type": "rating",
+    "target_id": "tool_nodejs_verify"
+  }
+}

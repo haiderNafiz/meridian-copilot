@@ -1,0 +1,11 @@
+{
+  "audit_id": "aud_5369545f5a",
+  "entity_id": "promo_9d5625fc08",
+  "actor_id": "node_admin",
+  "action": "evaluate_promotion",
+  "timestamp": "2026-07-29T17:41:26.438594Z",
+  "changes": {
+    "status": "approved",
+    "promoted_file": "v1_rev2.json"
+  }
+}

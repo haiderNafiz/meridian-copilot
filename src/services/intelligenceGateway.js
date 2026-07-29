@@ -13,6 +13,7 @@ import { opportunityIntelligenceClient } from "./opportunityIntelligenceClient.j
 import { revenueCopilotClient } from "./revenueCopilotClient.js";
 import { evaluationClient } from "./evaluationClient.js";
 import { replayClient } from "./replayClient.js";
+import { feedbackClient } from "./feedbackClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -484,6 +485,46 @@ export const intelligenceGateway = {
   async generateDebugReport(replayId, overrideConfig = null, format = "json") {
     console.log(`[Intelligence Gateway] Routing generateDebugReport - ReplayID: ${replayId} Format: ${format}`);
     return replayClient.generateDebugReport(replayId, overrideConfig, format);
+  },
+
+  /**
+   * Facade method to submit feedback.
+   */
+  async submitFeedback(targetId, targetType, runId, feedbackType, feedbackPayload, reviewerId = null, replayId = null, evaluationId = null, metadata = {}) {
+    console.log(`[Intelligence Gateway] Routing submitFeedback for Target: ${targetId}`);
+    return feedbackClient.submitFeedback(targetId, targetType, runId, feedbackType, feedbackPayload, reviewerId, replayId, evaluationId, metadata);
+  },
+
+  /**
+   * Facade method to list feedback.
+   */
+  async listFeedback(targetId = null, runId = null) {
+    console.log(`[Intelligence Gateway] Routing listFeedback - TargetID: ${targetId}`);
+    return feedbackClient.listFeedback(targetId, runId);
+  },
+
+  /**
+   * Facade method to retrieve feedback record.
+   */
+  async getFeedback(feedbackId) {
+    console.log(`[Intelligence Gateway] Routing getFeedback - FeedbackID: ${feedbackId}`);
+    return feedbackClient.getFeedback(feedbackId);
+  },
+
+  /**
+   * Facade method to compute feedback summary/analytics.
+   */
+  async feedbackSummary(targetId) {
+    console.log(`[Intelligence Gateway] Routing feedbackSummary - TargetID: ${targetId}`);
+    return feedbackClient.feedbackSummary(targetId);
+  },
+
+  /**
+   * Facade method to promote target replay item.
+   */
+  async promoteDatasetItem(replayId, targetDomain, targetDatasetType, targetVersion, actor) {
+    console.log(`[Intelligence Gateway] Routing promoteDatasetItem for Replay: ${replayId}`);
+    return feedbackClient.promoteDatasetItem(replayId, targetDomain, targetDatasetType, targetVersion, actor);
   },
 
   /**
