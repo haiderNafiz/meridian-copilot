@@ -584,6 +584,71 @@ async def run_revenue_copilot(
             collector.metadata = result.metadata
         return result.model_dump_json()
 
+@mcp.tool(
+    name="run_evaluation",
+    description="Run evaluation on a dataset using target component configuration settings."
+)
+async def run_evaluation(
+    domain: str,
+    dataset_type: str,
+    version: str,
+    config: dict,
+    experiment_id: Optional[str] = "exp_default",
+    context: Optional[dict] = None
+) -> str:
+    """
+    Load dataset and execute evaluation suite against target config specifications.
+    """
+    with mcp_telemetry("run_evaluation", context) as collector:
+        from src.intelligence.tools.evaluation_framework.schema import EvaluationConfig, EvaluationResult
+        from src.intelligence.tools.evaluation_framework.dataset.registry import DatasetRegistry
+        from src.intelligence.tools.evaluation_framework.service import get_evaluation_service
+        
+        # Load dataset
+        registry = DatasetRegistry()
+        dataset = registry.get_dataset(domain=domain, dataset_type=dataset_type, version=version)
+        
+        # Validate config
+        config_model = EvaluationConfig.model_validate(config)
+        
+        # Trigger evaluation service
+        service = get_evaluation_service()
+        report = service.run_evaluation(dataset, config_model, experiment_id=experiment_id)
+        
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+        
+        res_metadata = ResponseMetadata(
+            provider="evaluation_framework",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        
+        result = EvaluationResult(
+            report=report,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        if hasattr(result, "metadata") and result.metadata:
+            collector.metadata = result.metadata
+        return result.model_dump_json()
+
+@mcp.tool(
+    name="list_evaluation_datasets",
+    description="List all available datasets in the registry."
+)
+async def list_evaluation_datasets(context: Optional[dict] = None) -> str:
+    """
+    Return lists of available dataset files in registry directories.
+    """
+    with mcp_telemetry("list_evaluation_datasets", context):
+        from src.intelligence.tools.evaluation_framework.dataset.registry import DatasetRegistry
+        registry = DatasetRegistry()
+        return json.dumps(registry.list_datasets())
+
 if __name__ == "__main__":
     # Start the server using stdio transport
     mcp.run()

@@ -11,6 +11,7 @@ import { plannerClient } from "./plannerClient.js";
 import { conversationMemoryClient } from "./conversationMemoryClient.js";
 import { opportunityIntelligenceClient } from "./opportunityIntelligenceClient.js";
 import { revenueCopilotClient } from "./revenueCopilotClient.js";
+import { evaluationClient } from "./evaluationClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -419,6 +420,35 @@ export const intelligenceGateway = {
       opportunityAssessment,
       contextSnapshot,
       conversationContext,
+      context
+    );
+  },
+
+  /**
+   * Facade method to run evaluations.
+   * @param {string} domain - Mapped dataset domain.
+   * @param {string} datasetType - Golden/Synthetic/Regression datasets tag.
+   * @param {string} version - Dataset version identifier.
+   * @param {Object} config - Config metrics specifications.
+   * @param {string} [experimentId] - Experiment group.
+   * @param {Object} [jobContextData] - Custom context identifiers.
+   * @returns {Promise<Object>} The resolved EvaluationResult.
+   */
+  async runEvaluation(domain, datasetType, version, config, experimentId = "exp_default", jobContextData = {}) {
+    const context = {
+      event_id: jobContextData.event_id || `evt_${Math.random().toString(36).substring(2, 11)}`,
+      job_id: jobContextData.job_id || "direct_call",
+      trace_id: jobContextData.trace_id || jobContextData.job_id || `trace_${Math.random().toString(36).substring(2, 11)}`
+    };
+
+    console.log(`[Intelligence Gateway] Routing runEvaluation - TraceID: ${context.trace_id}`);
+
+    return evaluationClient.runEvaluation(
+      domain,
+      datasetType,
+      version,
+      config,
+      experimentId,
       context
     );
   },

@@ -1,0 +1,86 @@
+{
+  "report_id": "rep_f6bfff343e",
+  "run_id": "run_76fc962581",
+  "experiment_id": "exp_default",
+  "dataset_id": "intent_golden",
+  "target_tool": "evaluation_default",
+  "overall_score": 1.0,
+  "run_results": [
+    {
+      "item_id": "item1",
+      "actual_output": {
+        "result": "mocked",
+        "tool": "evaluation_default",
+        "input": {
+          "raw_text": "hello"
+        }
+      },
+      "metrics": [
+        {
+          "metric_name": "classification",
+          "score": 1.0,
+          "passed": true,
+          "details": {
+            "prediction": "{'result': 'mocked', 'tool': 'evaluation_default', 'input': {'raw_text': 'hello'}}",
+            "expected": "{'result': 'mocked', 'tool': 'evaluation_default', 'input': {'raw_text': 'hello'}}"
+          }
+        }
+      ],
+      "resource": {
+        "cpu_percent": 1.5,
+        "peak_ram_mb": 120.0,
+        "average_ram_mb": 115.0,
+        "duration_ms": 0.0030007213354110718,
+        "throughput_items_per_sec": 333253.20422098076,
+        "gpu_memory_mb": null,
+        "gpu_utilization": null,
+        "disk_io": null,
+        "network_io": null
+      },
+      "cost": {
+        "prompt_tokens": 50,
+        "completion_tokens": 10,
+        "embedding_tokens": 0,
+        "estimated_cost": 0.001,
+        "currency": "USD",
+        "provider": "mock"
+      },
+      "artifacts": {
+        "prompt": "Mock prompt for evaluation_default"
+      },
+      "warnings": []
+    }
+  ],
+  "passed": true,
+  "recommendations": [],
+  "created_at": "2026-07-29T08:14:47.475658Z",
+  "reproducibility": {
+    "random_seed": 42,
+    "model_version": "latest",
+    "embedding_version": null,
+    "provider": "groq",
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "git_commit": null,
+    "platform_version": "1.0.0"
+  },
+  "cost_summary": {
+    "prompt_tokens": 50,
+    "completion_tokens": 10,
+    "embedding_tokens": 0,
+    "estimated_cost": 0.001,
+    "currency": "USD",
+    "provider": "groq"
+  },
+  "resource_summary": {
+    "cpu_percent": 1.5,
+    "peak_ram_mb": 120.0,
+    "average_ram_mb": 115.0,
+    "duration_ms": 0.0030007213354110718,
+    "throughput_items_per_sec": 333253.20422098076,
+    "gpu_memory_mb": null,
+    "gpu_utilization": null,
+    "disk_io": null,
+    "network_io": null
+  }
+}

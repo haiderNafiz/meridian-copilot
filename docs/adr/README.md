@@ -15,6 +15,7 @@ This directory contains Architecture Decision Records tracking major design deci
 | [ADR-007](ADR-007-opportunity-intelligence.md) | Opportunity Intelligence is Decoupled and Strategy-Driven | Accepted | 2026-07-27 |
 | [ADR-008](ADR-008-generalize-profiler-and-scorer.md) | Generalizing Profiler and Scorer Services via Strategy Patterns | Accepted | 2026-07-27 |
 | [ADR-009](ADR-009-revenue-copilot-action-generation.md) | Separating Action Generation from Opportunity Assessment | Accepted | 2026-07-27 |
+| [ADR-010](ADR-010-evaluation-framework-design.md) | Evaluation Framework Design separating Execution Target, Scoring Strategy, and Dataset Registry | Accepted | 2026-07-29 |
 
 ---
 
