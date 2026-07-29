@@ -12,6 +12,7 @@ import { conversationMemoryClient } from "./conversationMemoryClient.js";
 import { opportunityIntelligenceClient } from "./opportunityIntelligenceClient.js";
 import { revenueCopilotClient } from "./revenueCopilotClient.js";
 import { evaluationClient } from "./evaluationClient.js";
+import { replayClient } from "./replayClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -451,6 +452,38 @@ export const intelligenceGateway = {
       experimentId,
       context
     );
+  },
+
+  /**
+   * Facade method to manually create a replay session.
+   */
+  async createReplay(targetId, inputPayload, outputPayload, parentReplayId = null, metadata = {}) {
+    console.log(`[Intelligence Gateway] Routing createReplay for Target: ${targetId}`);
+    return replayClient.createReplay(targetId, inputPayload, outputPayload, parentReplayId, metadata);
+  },
+
+  /**
+   * Facade method to run a replay.
+   */
+  async replayExecution(replayId, overrideConfig = null) {
+    console.log(`[Intelligence Gateway] Routing replayExecution - ReplayID: ${replayId}`);
+    return replayClient.replayExecution(replayId, overrideConfig);
+  },
+
+  /**
+   * Facade method to compare replayed runs.
+   */
+  async compareReplays(replayId, overrideConfig = null) {
+    console.log(`[Intelligence Gateway] Routing compareReplays - ReplayID: ${replayId}`);
+    return replayClient.compareReplays(replayId, overrideConfig);
+  },
+
+  /**
+   * Facade method to generate debug report.
+   */
+  async generateDebugReport(replayId, overrideConfig = null, format = "json") {
+    console.log(`[Intelligence Gateway] Routing generateDebugReport - ReplayID: ${replayId} Format: ${format}`);
+    return replayClient.generateDebugReport(replayId, overrideConfig, format);
   },
 
   /**

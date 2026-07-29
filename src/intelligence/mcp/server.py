@@ -1,5 +1,5 @@
 from fastmcp import FastMCP
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 from src.intelligence.tools.intent_classifier.classifier import IntentClassifier
 from src.intelligence.tools.intent_classifier.schema import IntentInput
 from src.intelligence.tools.candidate_profiler.profiler import get_candidate_profiler_service
@@ -648,6 +648,152 @@ async def list_evaluation_datasets(context: Optional[dict] = None) -> str:
         from src.intelligence.tools.evaluation_framework.dataset.registry import DatasetRegistry
         registry = DatasetRegistry()
         return json.dumps(registry.list_datasets())
+
+@mcp.tool(
+    name="create_replay",
+    description="Manually record a target execution input/output payload for debugging."
+)
+async def create_replay(
+    target_id: str,
+    input_payload: Any,
+    output_payload: Any,
+    parent_replay_id: Optional[str] = None,
+    metadata: Optional[dict] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("create_replay", context) as collector:
+        from src.intelligence.tools.replay_debug.service import get_replay_service
+        from src.intelligence.tools.replay_debug.schema import ReplayResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_replay_service()
+        record = service.create_replay(
+            target_id=target_id,
+            input_payload=input_payload,
+            output_payload=output_payload,
+            parent_replay_id=parent_replay_id,
+            metadata=metadata
+        )
+
+        res_metadata = ResponseMetadata(
+            provider="replay_debug",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = ReplayResponse(
+            replay_record=record,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="replay_execution",
+    description="Re-run a recorded execution with optional prompt/model configuration overrides."
+)
+async def replay_execution(
+    replay_id: str,
+    override_config: Optional[dict] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("replay_execution", context) as collector:
+        from src.intelligence.tools.replay_debug.service import get_replay_service
+        from src.intelligence.tools.replay_debug.schema import ReplayResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_replay_service()
+        result = service.replay_execution(replay_id, override_config=override_config)
+
+        res_metadata = ResponseMetadata(
+            provider="replay_debug",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = ReplayResponse(
+            execution_result=result,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="compare_replays",
+    description="Compare an original execution against a replayed execution to isolate regressions."
+)
+async def compare_replays(
+    replay_id: str,
+    override_config: Optional[dict] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("compare_replays", context) as collector:
+        from src.intelligence.tools.replay_debug.service import get_replay_service
+        from src.intelligence.tools.replay_debug.schema import ReplayResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_replay_service()
+        diff = service.compare_replays(replay_id, override_config=override_config)
+
+        res_metadata = ResponseMetadata(
+            provider="replay_debug",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = ReplayResponse(
+            diff=diff,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="generate_debug_report",
+    description="Produce a structured JSON/Markdown debug report for code/model regressions."
+)
+async def generate_debug_report(
+    replay_id: str,
+    override_config: Optional[dict] = None,
+    format: Optional[str] = "json",
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("generate_debug_report", context) as collector:
+        from src.intelligence.tools.replay_debug.service import get_replay_service
+        from src.intelligence.tools.replay_debug.schema import ReplayResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_replay_service()
+        path = service.generate_debug_report(replay_id, override_config=override_config, format=format)
+
+        res_metadata = ResponseMetadata(
+            provider="replay_debug",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = ReplayResponse(
+            report_path=path,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
 
 if __name__ == "__main__":
     # Start the server using stdio transport
