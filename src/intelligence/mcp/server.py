@@ -1009,5 +1009,241 @@ async def promote_dataset_item(
         collector.metadata = res_metadata
         return response.model_dump_json()
 
+@mcp.tool(
+    name="ingest_knowledge",
+    description="Ingest a document or dataset into the Production Knowledge Platform registry."
+)
+async def ingest_knowledge(
+    namespace: str,
+    content: str,
+    asset_type: str,
+    asset_id: Optional[str] = None,
+    metadata: Optional[dict] = None,
+    version: str = "v1",
+    parent_version_id: Optional[str] = None,
+    derived_from_asset_id: Optional[str] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("ingest_knowledge", context) as collector:
+        from src.intelligence.tools.knowledge_platform.service import get_knowledge_service
+        from src.intelligence.tools.knowledge_platform.schema import KnowledgeResponse, AssetType
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_knowledge_service()
+        asset = service.ingest_knowledge(
+            namespace=namespace,
+            content=content,
+            asset_type=AssetType(asset_type),
+            asset_id=asset_id,
+            metadata=metadata,
+            version=version,
+            parent_version_id=parent_version_id,
+            derived_from_asset_id=derived_from_asset_id
+        )
+
+        res_metadata = ResponseMetadata(
+            provider="knowledge_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = KnowledgeResponse(
+            asset=asset,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="list_knowledge",
+    description="List all available assets registered in the platform namespaces."
+)
+async def list_knowledge(
+    namespace: Optional[str] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("list_knowledge", context) as collector:
+        from src.intelligence.tools.knowledge_platform.service import get_knowledge_service
+        from src.intelligence.tools.knowledge_platform.schema import KnowledgeResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_knowledge_service()
+        assets = service.list_knowledge(namespace=namespace)
+
+        res_metadata = ResponseMetadata(
+            provider="knowledge_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = KnowledgeResponse(
+            assets=assets,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="retrieve_knowledge_platform",
+    description="Query knowledge assets semantically using hybrid vector and BM25 strategies."
+)
+async def retrieve_knowledge_platform(
+    query: str,
+    namespace: Optional[str] = None,
+    strategy: str = "hybrid",
+    filters: Optional[dict] = None,
+    limit: int = 5,
+    min_score: Optional[float] = None,
+    metadata: Optional[dict] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("retrieve_knowledge_platform", context) as collector:
+        from src.intelligence.tools.knowledge_platform.service import get_knowledge_service
+        from src.intelligence.tools.knowledge_platform.schema import KnowledgeResponse, KnowledgeQuery
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        query_model = KnowledgeQuery(
+            query=query,
+            namespace=namespace,
+            strategy=strategy,
+            filters=filters or {},
+            limit=limit,
+            min_score=min_score,
+            metadata=metadata or {}
+        )
+
+        service = get_knowledge_service()
+        chunks = service.retrieve_knowledge(query_model)
+
+        res_metadata = ResponseMetadata(
+            provider="knowledge_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = KnowledgeResponse(
+            chunks=chunks,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="update_index",
+    description="Save or consolidate structured indices for an index registry partition."
+)
+async def update_index(
+    index_name: str,
+    index_data: dict,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("update_index", context) as collector:
+        from src.intelligence.tools.knowledge_platform.service import get_knowledge_service
+        from src.intelligence.tools.knowledge_platform.schema import KnowledgeResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_knowledge_service()
+        service.provider.save_index(index_name, index_data)
+
+        res_metadata = ResponseMetadata(
+            provider="knowledge_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = KnowledgeResponse(
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="rebuild_embeddings",
+    description="Regenerate vector embeddings for all assets matching a namespace."
+)
+async def rebuild_embeddings(
+    namespace: str,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("rebuild_embeddings", context) as collector:
+        from src.intelligence.tools.knowledge_platform.service import get_knowledge_service
+        from src.intelligence.tools.knowledge_platform.schema import KnowledgeResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_knowledge_service()
+        service.rebuild_embeddings(namespace)
+
+        res_metadata = ResponseMetadata(
+            provider="knowledge_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = KnowledgeResponse(
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="knowledge_statistics",
+    description="Compute retrieval precision, namespace size, and storage utilization stats."
+)
+async def knowledge_statistics(
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("knowledge_statistics", context) as collector:
+        from src.intelligence.tools.knowledge_platform.service import get_knowledge_service
+        from src.intelligence.tools.knowledge_platform.analytics import KnowledgeAnalyticsRegistry
+        from src.intelligence.tools.knowledge_platform.schema import KnowledgeResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_knowledge_service()
+        assets = service.list_knowledge()
+        
+        chunks = []
+        for ns in service.registry.list_namespaces():
+            chunks.extend(service.index_registry.get_chunks(ns))
+            
+        analytics = KnowledgeAnalyticsRegistry()
+        summary = analytics.compute_all(assets, chunks)
+
+        res_metadata = ResponseMetadata(
+            provider="knowledge_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = KnowledgeResponse(
+            analytics_summary=summary,
+            status=ResponseStatus.SUCCESS,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
 if __name__ == "__main__":
     mcp.run()

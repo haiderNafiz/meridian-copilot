@@ -14,6 +14,7 @@ import { revenueCopilotClient } from "./revenueCopilotClient.js";
 import { evaluationClient } from "./evaluationClient.js";
 import { replayClient } from "./replayClient.js";
 import { feedbackClient } from "./feedbackClient.js";
+import { knowledgePlatformClient } from "./knowledgePlatformClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -525,6 +526,36 @@ export const intelligenceGateway = {
   async promoteDatasetItem(replayId, targetDomain, targetDatasetType, targetVersion, actor) {
     console.log(`[Intelligence Gateway] Routing promoteDatasetItem for Replay: ${replayId}`);
     return feedbackClient.promoteDatasetItem(replayId, targetDomain, targetDatasetType, targetVersion, actor);
+  },
+
+  async ingestKnowledge(namespace, content, assetType, assetId = null, metadata = {}, version = "v1", parentVersionId = null, derivedFromAssetId = null) {
+    console.log(`[Intelligence Gateway] Routing ingestKnowledge for namespace: ${namespace}`);
+    return knowledgePlatformClient.ingestKnowledge(namespace, content, assetType, assetId, metadata, version, parentVersionId, derivedFromAssetId);
+  },
+
+  async listKnowledge(namespace = null) {
+    console.log(`[Intelligence Gateway] Routing listKnowledge for namespace: ${namespace}`);
+    return knowledgePlatformClient.listKnowledge(namespace);
+  },
+
+  async retrieveKnowledgePlatform(query, namespace = null, strategy = "hybrid", filters = {}, limit = 5, minScore = null, metadata = {}) {
+    console.log(`[Intelligence Gateway] Routing retrieveKnowledgePlatform: ${query}`);
+    return knowledgePlatformClient.retrieveKnowledgePlatform(query, namespace, strategy, filters, limit, minScore, metadata);
+  },
+
+  async updateIndex(indexName, indexData) {
+    console.log(`[Intelligence Gateway] Routing updateIndex: ${indexName}`);
+    return knowledgePlatformClient.updateIndex(indexName, indexData);
+  },
+
+  async rebuildEmbeddings(namespace) {
+    console.log(`[Intelligence Gateway] Routing rebuildEmbeddings for: ${namespace}`);
+    return knowledgePlatformClient.rebuildEmbeddings(namespace);
+  },
+
+  async knowledgeStatistics() {
+    console.log(`[Intelligence Gateway] Routing knowledgeStatistics`);
+    return knowledgePlatformClient.knowledgeStatistics();
   },
 
   /**

@@ -18,6 +18,7 @@ This directory contains Architecture Decision Records tracking major design deci
 | [ADR-010](ADR-010-evaluation-framework-design.md) | Evaluation Framework Design separating Execution Target, Scoring Strategy, and Dataset Registry | Accepted | 2026-07-29 |
 | [ADR-011](ADR-011-replay-debug-framework.md) | Replay & Debug Framework separating Tracing Interceptors, Comparison Analysis, and Lineage Lineage | Accepted | 2026-07-29 |
 | [ADR-012](ADR-012-human-feedback-platform.md) | Human Feedback Platform separating Strategy Normalizers, Consensus Calculators, and Promotion Policies | Accepted | 2026-07-29 |
+| [ADR-013](ADR-013-production-knowledge-platform.md) | Production Knowledge Platform separating ChunkStrategies, EmbeddingRegistries, and Hybrid Retrieval | Accepted | 2026-07-29 |
 
 ---
 
