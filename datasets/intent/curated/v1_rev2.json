@@ -1,0 +1,24 @@
+{
+  "dataset_id": "intent_curated_rev2",
+  "version": "v1_rev2",
+  "dataset_type": "curated",
+  "items": [
+    {
+      "id": "promoted_rep_mcp_4760df",
+      "input_payload": {
+        "text": "hello"
+      },
+      "expected_output": {
+        "intent": "greeting"
+      },
+      "tags": [
+        "promoted",
+        "ref_rep_mcp"
+      ],
+      "metadata": {
+        "promotion_id": "promo_677afcd278",
+        "promoted_at": "2026-07-29T20:16:09.265729Z"
+      }
+    }
+  ]
+}

@@ -15,6 +15,7 @@ import { evaluationClient } from "./evaluationClient.js";
 import { replayClient } from "./replayClient.js";
 import { feedbackClient } from "./feedbackClient.js";
 import { knowledgePlatformClient } from "./knowledgePlatformClient.js";
+import { monitoringClient } from "./monitoringClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -556,6 +557,36 @@ export const intelligenceGateway = {
   async knowledgeStatistics() {
     console.log(`[Intelligence Gateway] Routing knowledgeStatistics`);
     return knowledgePlatformClient.knowledgeStatistics();
+  },
+
+  async monitoringStatus(componentId = null) {
+    console.log(`[Intelligence Gateway] Routing monitoringStatus: ${componentId}`);
+    return monitoringClient.monitoringStatus(componentId);
+  },
+
+  async monitoringMetrics(category = null) {
+    console.log(`[Intelligence Gateway] Routing monitoringMetrics: ${category}`);
+    return monitoringClient.monitoringMetrics(category);
+  },
+
+  async monitoringEvents(severity = null) {
+    console.log(`[Intelligence Gateway] Routing monitoringEvents: ${severity}`);
+    return monitoringClient.monitoringEvents(severity);
+  },
+
+  async monitoringHealth(componentId) {
+    console.log(`[Intelligence Gateway] Routing monitoringHealth: ${componentId}`);
+    return monitoringClient.monitoringHealth(componentId);
+  },
+
+  async monitoringAlerts() {
+    console.log(`[Intelligence Gateway] Routing monitoringAlerts`);
+    return monitoringClient.monitoringAlerts();
+  },
+
+  async monitoringTrace(traceId) {
+    console.log(`[Intelligence Gateway] Routing monitoringTrace: ${traceId}`);
+    return monitoringClient.monitoringTrace(traceId);
   },
 
   /**

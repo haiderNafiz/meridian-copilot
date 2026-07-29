@@ -1245,5 +1245,223 @@ async def knowledge_statistics(
         collector.metadata = res_metadata
         return response.model_dump_json()
 
+@mcp.tool(
+    name="monitoring_status",
+    description="Get registered monitored components and check system state logs."
+)
+async def monitoring_status(
+    component_id: Optional[str] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("monitoring_status", context) as collector:
+        from src.intelligence.tools.monitoring_observability.service import get_monitoring_service
+        from src.intelligence.tools.monitoring_observability.schema import MonitoringResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_monitoring_service()
+        res_metadata = ResponseMetadata(
+            provider="monitoring_observability",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+
+        if component_id:
+            comp = service.registry.get_component(component_id)
+            response = MonitoringResponse(
+                status=ResponseStatus.SUCCESS,
+                component=comp,
+                metadata=res_metadata
+            )
+        else:
+            components = service.registry.list_components()
+            response = MonitoringResponse(
+                status=ResponseStatus.SUCCESS,
+                analytics_summary={"total_components": len(components)},
+                metadata=res_metadata
+            )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="monitoring_metrics",
+    description="Retrieve latency, throughput, token usage, and cost logs."
+)
+async def monitoring_metrics(
+    category: Optional[str] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("monitoring_metrics", context) as collector:
+        from src.intelligence.tools.monitoring_observability.service import get_monitoring_service
+        from src.intelligence.tools.monitoring_observability.schema import MonitoringResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_monitoring_service()
+        metrics = service.provider.load_metrics()
+        if category:
+            metrics = [m for m in metrics if getattr(m, "category", "") == category]
+
+        res_metadata = ResponseMetadata(
+            provider="monitoring_observability",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = MonitoringResponse(
+            status=ResponseStatus.SUCCESS,
+            metrics=metrics,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="monitoring_events",
+    description="Retrieve recent monitoring events, optionally filtered by severity."
+)
+async def monitoring_events(
+    severity: Optional[str] = None,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("monitoring_events", context) as collector:
+        from src.intelligence.tools.monitoring_observability.service import get_monitoring_service
+        from src.intelligence.tools.monitoring_observability.schema import MonitoringResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_monitoring_service()
+        events = service.provider.load_events()
+        if severity:
+            events = [e for e in events if getattr(e, "severity", "") == severity]
+
+        res_metadata = ResponseMetadata(
+            provider="monitoring_observability",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = MonitoringResponse(
+            status=ResponseStatus.SUCCESS,
+            events=events,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="monitoring_health",
+    description="Run custom status health check validation on a specific component."
+)
+async def monitoring_health(
+    component_id: str,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("monitoring_health", context) as collector:
+        from src.intelligence.tools.monitoring_observability.service import get_monitoring_service
+        from src.intelligence.tools.monitoring_observability.schema import MonitoringResponse, MonitoredComponent, ComponentHealth
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_monitoring_service()
+        comp = service.registry.get_component(component_id)
+        if not comp:
+            comp = MonitoredComponent(
+                component_id=component_id,
+                component_type="unknown",
+                health_status=ComponentHealth.HEALTHY
+            )
+            service.registry.register_component(comp)
+            
+        res_metadata = ResponseMetadata(
+            provider="monitoring_observability",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = MonitoringResponse(
+            status=ResponseStatus.SUCCESS,
+            component=comp,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="monitoring_alerts",
+    description="Retrieve currently triggered monitoring and policy regression alerts."
+)
+async def monitoring_alerts(
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("monitoring_alerts", context) as collector:
+        from src.intelligence.tools.monitoring_observability.service import get_monitoring_service
+        from src.intelligence.tools.monitoring_observability.schema import MonitoringResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_monitoring_service()
+        alerts = service.provider.load_alerts()
+
+        res_metadata = ResponseMetadata(
+            provider="monitoring_observability",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = MonitoringResponse(
+            status=ResponseStatus.SUCCESS,
+            alerts=alerts,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="monitoring_trace",
+    description="Retrieve timelines and context spans matching trace identifier."
+)
+async def monitoring_trace(
+    trace_id: str,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("monitoring_trace", context) as collector:
+        from src.intelligence.tools.monitoring_observability.service import get_monitoring_service
+        from src.intelligence.tools.monitoring_observability.schema import MonitoringResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_monitoring_service()
+        spans = service.provider.load_spans()
+        matched = [s for s in spans if getattr(s, "trace_id", "") == trace_id]
+
+        res_metadata = ResponseMetadata(
+            provider="monitoring_observability",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        
+        response = MonitoringResponse(
+            status=ResponseStatus.SUCCESS,
+            span=matched[0] if matched else None,
+            metadata=res_metadata
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
 if __name__ == "__main__":
     mcp.run()

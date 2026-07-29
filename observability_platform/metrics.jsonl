@@ -1,0 +1,9 @@
+{"metric_name": "do_work_success", "metric_type": "counter", "value": 1.0, "unit": "count", "timestamp": "2026-07-29T20:03:37.741405+00:00", "tags": {}}
+{"metric_name": "do_work_duration", "metric_type": "timer", "value": 1.002, "unit": "ms", "timestamp": "2026-07-29T20:03:37.744406+00:00", "tags": {}}
+{"metric_name": "do_work_success", "metric_type": "counter", "value": 1.0, "unit": "count", "timestamp": "2026-07-29T20:04:44.059433+00:00", "tags": {}}
+{"metric_name": "do_work_duration", "metric_type": "timer", "value": 0.0, "unit": "ms", "timestamp": "2026-07-29T20:04:44.060426+00:00", "tags": {}}
+{"metric_name": "cpu_load", "metric_type": "gauge", "value": 0.75, "unit": "ratio", "timestamp": "2026-07-29T20:05:06.255527+00:00", "tags": {}}
+{"metric_name": "do_work_success", "metric_type": "counter", "value": 1.0, "unit": "count", "timestamp": "2026-07-29T20:09:29.173127+00:00", "tags": {}}
+{"metric_name": "do_work_duration", "metric_type": "timer", "value": 0.9990000000000001, "unit": "ms", "timestamp": "2026-07-29T20:09:29.176126+00:00", "tags": {}}
+{"metric_name": "do_work_success", "metric_type": "counter", "value": 1.0, "unit": "count", "timestamp": "2026-07-29T20:17:07.349653+00:00", "tags": {}}
+{"metric_name": "do_work_duration", "metric_type": "timer", "value": 1.002, "unit": "ms", "timestamp": "2026-07-29T20:17:07.351650+00:00", "tags": {}}

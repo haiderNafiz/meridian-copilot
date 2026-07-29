@@ -19,6 +19,7 @@ This directory contains Architecture Decision Records tracking major design deci
 | [ADR-011](ADR-011-replay-debug-framework.md) | Replay & Debug Framework separating Tracing Interceptors, Comparison Analysis, and Lineage Lineage | Accepted | 2026-07-29 |
 | [ADR-012](ADR-012-human-feedback-platform.md) | Human Feedback Platform separating Strategy Normalizers, Consensus Calculators, and Promotion Policies | Accepted | 2026-07-29 |
 | [ADR-013](ADR-013-production-knowledge-platform.md) | Production Knowledge Platform separating ChunkStrategies, EmbeddingRegistries, and Hybrid Retrieval | Accepted | 2026-07-29 |
+| [ADR-014](ADR-014-monitoring-observability.md) | AI Monitoring & Observability Platform Design | Accepted | 2026-07-29 |
 
 ---
 
