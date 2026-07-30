@@ -16,6 +16,7 @@ import { replayClient } from "./replayClient.js";
 import { feedbackClient } from "./feedbackClient.js";
 import { knowledgePlatformClient } from "./knowledgePlatformClient.js";
 import { monitoringClient } from "./monitoringClient.js";
+import { deploymentClient } from "./deploymentClient.js";
 import { mcpClient } from "./mcpClient.js";
 
 export const intelligenceGateway = {
@@ -587,6 +588,26 @@ export const intelligenceGateway = {
   async monitoringTrace(traceId) {
     console.log(`[Intelligence Gateway] Routing monitoringTrace: ${traceId}`);
     return monitoringClient.monitoringTrace(traceId);
+  },
+
+  async deploymentBootstrap(manifest) {
+    console.log(`[Intelligence Gateway] Routing deploymentBootstrap: ${manifest.manifest_id}`);
+    return deploymentClient.bootstrap(manifest);
+  },
+
+  async deploymentDiagnostics() {
+    console.log(`[Intelligence Gateway] Routing deploymentDiagnostics`);
+    return deploymentClient.runDiagnostics();
+  },
+
+  async deploymentRollback() {
+    console.log(`[Intelligence Gateway] Routing deploymentRollback`);
+    return deploymentClient.triggerRollback();
+  },
+
+  async deploymentCapabilities() {
+    console.log(`[Intelligence Gateway] Routing deploymentCapabilities`);
+    return deploymentClient.listCapabilities();
   },
 
   /**

@@ -7,3 +7,5 @@
 {"metric_name": "do_work_duration", "metric_type": "timer", "value": 0.9990000000000001, "unit": "ms", "timestamp": "2026-07-29T20:09:29.176126+00:00", "tags": {}}
 {"metric_name": "do_work_success", "metric_type": "counter", "value": 1.0, "unit": "count", "timestamp": "2026-07-29T20:17:07.349653+00:00", "tags": {}}
 {"metric_name": "do_work_duration", "metric_type": "timer", "value": 1.002, "unit": "ms", "timestamp": "2026-07-29T20:17:07.351650+00:00", "tags": {}}
+{"metric_name": "do_work_success", "metric_type": "counter", "value": 1.0, "unit": "count", "timestamp": "2026-07-30T06:32:29.498270+00:00", "tags": {}}
+{"metric_name": "do_work_duration", "metric_type": "timer", "value": 21.478, "unit": "ms", "timestamp": "2026-07-30T06:32:29.535532+00:00", "tags": {}}

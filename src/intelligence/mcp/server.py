@@ -1463,5 +1463,139 @@ async def monitoring_trace(
         collector.metadata = res_metadata
         return response.model_dump_json()
 
+@mcp.tool(
+    name="deployment_bootstrap",
+    description="Deploy and configuration validate platform modules."
+)
+async def deployment_bootstrap(
+    manifest: dict,
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("deployment_bootstrap", context) as collector:
+        from src.intelligence.tools.deployment.service import get_deployment_service
+        from src.intelligence.tools.deployment.schema import DeploymentResponse, DeploymentManifest
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_deployment_service()
+        manifest_obj = DeploymentManifest.model_validate(manifest)
+        report = service.bootstrap(manifest_obj)
+
+        res_metadata = ResponseMetadata(
+            provider="deployment_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = DeploymentResponse(
+            status=ResponseStatus.SUCCESS,
+            message="System bootstrap completed successfully",
+            diagnostics=report,
+            metadata=res_metadata.model_dump()
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="deployment_diagnostics",
+    description="Retrieve startup, dependency, health, and readiness metrics."
+)
+async def deployment_diagnostics(
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("deployment_diagnostics", context) as collector:
+        from src.intelligence.tools.deployment.service import get_deployment_service
+        from src.intelligence.tools.deployment.schema import DeploymentResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_deployment_service()
+        report = service.run_diagnostics()
+
+        res_metadata = ResponseMetadata(
+            provider="deployment_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = DeploymentResponse(
+            status=ResponseStatus.SUCCESS,
+            diagnostics=report,
+            metadata=res_metadata.model_dump()
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="deployment_rollback",
+    description="Trigger rollback to revert platform configurations."
+)
+async def deployment_rollback(
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("deployment_rollback", context) as collector:
+        from src.intelligence.tools.deployment.service import get_deployment_service
+        from src.intelligence.tools.deployment.schema import DeploymentResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_deployment_service()
+        success = service.trigger_rollback()
+        report = service.run_diagnostics()
+
+        res_metadata = ResponseMetadata(
+            provider="deployment_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = DeploymentResponse(
+            status=ResponseStatus.SUCCESS if success else ResponseStatus.FAILURE,
+            message="Rollback completed" if success else "Rollback failed",
+            diagnostics=report,
+            metadata=res_metadata.model_dump()
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
+@mcp.tool(
+    name="deployment_capabilities",
+    description="List active platform capabilities."
+)
+async def deployment_capabilities(
+    context: Optional[dict] = None
+) -> str:
+    with mcp_telemetry("deployment_capabilities", context) as collector:
+        from src.intelligence.tools.deployment.service import get_deployment_service
+        from src.intelligence.tools.deployment.schema import DeploymentResponse
+        from src.intelligence.platform.metadata import ResponseMetadata
+        from src.intelligence.platform.contracts import ResponseStatus
+
+        service = get_deployment_service()
+        report = service.run_diagnostics()
+
+        res_metadata = ResponseMetadata(
+            provider="deployment_platform",
+            model="default",
+            prompt_version="1.0.0",
+            confidence=1.0,
+            fallback_used=False,
+            provider_latency_ms=0.0
+        )
+        response = DeploymentResponse(
+            status=ResponseStatus.SUCCESS,
+            message=f"Active capabilities: {report.active_capabilities}",
+            diagnostics=report,
+            metadata=res_metadata.model_dump()
+        )
+        collector.metadata = res_metadata
+        return response.model_dump_json()
+
 if __name__ == "__main__":
     mcp.run()
